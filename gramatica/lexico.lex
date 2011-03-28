@@ -1,3 +1,5 @@
+package compil.inv.parser;
+
 import java_cup.*;
 import java_cup.runtime.*;
       
