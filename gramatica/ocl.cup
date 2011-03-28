@@ -1,0 +1,60 @@
+
+package compil.inv.parser;
+
+import java_cup.runtime.*;
+
+parser code {:
+    
+    public void report_error(String message, Object info) {
+   
+        StringBuffer m = new StringBuffer("Error");
+   
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+            if (s.left >= 0) {
+                /* Add to the end of the StringBuffer error message
+                   the line number of the error in the input. */
+                m.append(" in line "+(s.left+1));   
+                /* Check if the column number in the input is greater
+                   or equal to zero. */
+                if (s.right >= 0)                    
+                    /* Add to the end of the StringBuffer error message
+                       the column number of the error in the input. */
+                    m.append(", column "+(s.right+1));
+            }
+        }
+   
+        m.append(" : "+message);
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+:};
+   
+
+   
+/* ------------Declaration of Terminals and Non Terminals Section----------- */
+   
+/* Terminals (tokens returned by the scanner).  
+
+   Terminals that have no value are listed first and then terminals
+   that do have an value, in this case an integer value, are listed on
+   the next line down. */
+
+terminal           COLON, DCOLON, SEMI, PLUS, MINUS, MULT, DIVIDE, 
+				   LPAREN, RPAREN, LBRACK, RBRACK, LCURLY, RCURLY,
+				   COMMA, EQUAL, NEQUAL, LT, GT, LE, GE, RARROW, DOTDOT,
+				   DOT, POUND, SEMICOL, BAR, ATSIGN, CONTEXT, BODY, PRE,
+				   POST, INV, INIT, SELECT, EXISTS, FOR_ALL, INCLUDING,
+				   EXCLUDING, OCL_IS_NEW, AT_PRE, RESULT, SIZE, STRING, TYPE, SELF,
+				   IF, THEN, ELSE, RELOP, IMPLIES, ENDIF, SET, TRUE, FALSE;
+
+terminal String ID;
+terminal Integer   NUMERO;
+
+non terminal Object Context;
+
+Context ::= CONTEXT;
