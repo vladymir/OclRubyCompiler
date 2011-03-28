@@ -32,7 +32,7 @@ LBRACK			= \[
 RBRACK			= \]
 LCURLY			= \{
 RCURLY			= \}
-COLON			= :
+COLON			= ":"
 DCOLON			= ::
 COMMA			= ,
 EQUAL			= =
@@ -61,27 +61,21 @@ TYPE            = String|Integer|Boolean|Real
 ID		 		= {LETRA}({LETRA}|{NUMERO})*
 STRING          = \"[ ~]*\"
 
-WhiteSpace     = {LineTerminator} | [ \t\f]
+WhiteSpace     = {LineTerminator} | [ \t\f] | " "
 
 
 %%
 /* ------------------------Lexical Rules Section---------------------- */
    
 /*keywords*/
-<YYINITIAL> "context" { System.out.println(" CONTEXT ");return symbol(OclSym.CONTEXT); }
-<YYINITIAL> "body" { return symbol(OclSym.BODY); }
-<YYINITIAL> "pre" { return symbol(OclSym.PRE); }
-<YYINITIAL> "post" { return symbol(OclSym.POST); }
-<YYINITIAL> "inv" { return symbol(OclSym.INV); }
-<YYINITIAL> "init" { return symbol(OclSym.INIT); }
+<YYINITIAL> "context" { System.out.println(yytext());return symbol(OclSym.CONTEXT); }
+<YYINITIAL> "inv" { System.out.println(yytext());return symbol(OclSym.INV); }
 <YYINITIAL> "select" { return symbol(OclSym.SELECT); }
 <YYINITIAL> "exists" { return symbol(OclSym.EXISTS); }
 <YYINITIAL> "forAll" { return symbol(OclSym.FOR_ALL); }
 <YYINITIAL> "including" { return symbol(OclSym.INCLUDING); }
 <YYINITIAL> "excluding" { return symbol(OclSym.EXCLUDING); }
 <YYINITIAL> "oclIsNew" { return symbol(OclSym.OCL_IS_NEW); }
-<YYINITIAL> {ATSIGN} "pre" { return symbol(OclSym.AT_PRE); }
-<YYINITIAL> "result" { return symbol(OclSym.RESULT); }
 <YYINITIAL> "size" { return symbol(OclSym.SIZE); }
 <YYINITIAL> "self" { return symbol(OclSym.SELF); }
 
@@ -101,9 +95,7 @@ WhiteSpace     = {LineTerminator} | [ \t\f]
 "then" { return symbol(OclSym.THEN); }
 "else" { return symbol(OclSym.ELSE); }
 "endif" { return symbol(OclSym.ENDIF); }
-"pre" { return symbol(OclSym.PRE); }
 "implies" { return symbol(OclSym.IMPLIES); }
-"post" { return symbol(OclSym.POST); }
 "set" { return symbol(OclSym.SET); }
 "true" { return symbol(OclSym.TRUE); }
 "false" { return symbol(OclSym.FALSE); }

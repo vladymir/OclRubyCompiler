@@ -1,4 +1,3 @@
-
 package compil.inv.parser;
 
 import java_cup.runtime.*;
@@ -44,17 +43,25 @@ parser code {:
    that do have an value, in this case an integer value, are listed on
    the next line down. */
 
-terminal           COLON, DCOLON, SEMI, PLUS, MINUS, MULT, DIVIDE, 
+terminal           SEMI, COLON, PLUS, MINUS, MULT, DIVIDE, 
 				   LPAREN, RPAREN, LBRACK, RBRACK, LCURLY, RCURLY,
 				   COMMA, EQUAL, NEQUAL, LT, GT, LE, GE, RARROW, DOTDOT,
-				   DOT, POUND, SEMICOL, BAR, ATSIGN, CONTEXT, BODY, PRE,
-				   POST, INV, INIT, SELECT, EXISTS, FOR_ALL, INCLUDING,
-				   EXCLUDING, OCL_IS_NEW, AT_PRE, RESULT, SIZE, STRING, TYPE, SELF,
+				   DOT, POUND, SEMICOL, BAR, ATSIGN, CONTEXT, 
+				   INV, SELECT, EXISTS, FOR_ALL, INCLUDING,
+				   EXCLUDING, OCL_IS_NEW,SIZE, STRING, TYPE, SELF,
 				   IF, THEN, ELSE, RELOP, IMPLIES, ENDIF, SET, TRUE, FALSE;
 
 terminal String ID;
 terminal Integer   NUMERO;
 
-non terminal Object Context;
+non terminal Object ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
+non terminal Object Id_01, ExpOcl;
 
-Context ::= CONTEXT;
+ExpressoesOcl ::= CONTEXT INV COLON ID  ;
+
+Restricao    ::= DeclaracaoContexto INV Id_01 COLON /*expressao*/ Id_01;
+
+DeclaracaoContexto ::= CONTEXT ClassifierContexto;
+ClassifierContexto ::= ID COLON ID | ID ;
+
+Id_01 ::= ID | ;
