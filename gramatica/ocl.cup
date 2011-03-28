@@ -55,6 +55,22 @@ terminal String ID;
 terminal Integer   NUMERO;
 
 non terminal Object ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
-non terminal Object Id_01, ExpOcl;
+non terminal Object ExpOcl, InvContext;
+non terminal Object ExpLogica, OperadorLogico, OperadorRelacional;
 
-ExpressoesOcl ::= CONTEXT ID INV COLON {:System.out.println("casei");:};
+
+ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}| ;
+
+Restricao     ::= DeclaracaoContexto InvContext;
+
+DeclaracaoContexto ::= CONTEXT ClassifierContexto;
+
+ClassifierContexto ::= ID | ID COLON ID ;
+
+InvContext	::= INV COLON ExpOcl| INV ID COLON /*Expressao OCL*/ ;
+
+ExpOcl ::= ExpLogica;
+
+
+OperadorLogico ::= AND | OR | XOR | IMPLIES;
+OperadorRelacional ::= EQUAL | GT | LT | GE | LE | NEQUAL;
