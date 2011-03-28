@@ -1,2 +1,0 @@
-context ParceiroPrograma
-inv: quantidadeDeClientes = programaFidelidade.cliente -> asSet() -> size()
