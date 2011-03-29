@@ -22,7 +22,7 @@ import static compil.inv.parser.OclSym.*;
         return new Symbol(type, yyline, yycolumn, value);
     }
 %}
-LineTerminator = \r|\n|\r\n
+LineTerminator 	= \r|\n|\r\n
 LPAREN			= \(
 RPAREN			= \)
 LBRACK			= \[
@@ -52,9 +52,8 @@ RELOP           = {LT}|{GT}|{LE}|{GE}|{NEQUAL}
 LETRA 			= [a-zA-Z]
 DIGITO 			= [0-9]
 INTEIRO			= {DIGITO}+
-REAL            = {INTEIRO}.{INTEIRO}
-HEXA            = ({REAL}|{INTEIRO})[eE]({REAL}|{INTEIRO})
-NUMERO          = {INTEIRO}|{REAL}|{HEXA}
+NUM_OPT			= ({DOT}{DIGITO}+)?((e|E)(PLUS|MINUS)?{DIGITO}+)?
+NUMERO          = {INTEIRO}{NUM_OPT}
 TYPE            = String|Integer|Boolean|Real
 ID		 		= {LETRA}({LETRA}|{NUMERO})*{MULT}?
 STRING          = \"({LETRA}|{NUMERO})*\"
