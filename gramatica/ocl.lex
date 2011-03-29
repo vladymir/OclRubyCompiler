@@ -93,8 +93,6 @@ WhiteSpace      = {LineTerminator} | [ \t\f]
 "endif" { return symbol(OclSym.ENDIF); }
 "implies" { return symbol(OclSym.IMPLIES); }
 "set" { return symbol(OclSym.SET); }
-"true" { return symbol(OclSym.TRUE); }
-"false" { return symbol(OclSym.FALSE); }
 
 {TYPE} { return symbol(OclSym.TYPE, yytext()); }
 {LBRACK} { return symbol(OclSym.LBRACK); }
