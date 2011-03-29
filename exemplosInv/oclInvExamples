@@ -45,3 +45,14 @@ context UseCase inv UseCase_WFR_4:
 --   [4] The names of the ExtensionPoints must be unique within the UseCase.
 
 	self.allExtensionPoints->forAll(x, y| x.name = y.name implies x = y) 
+-------------------------------
+
+context Customer
+inv: title = (if isMale = true 
+            then 'Mr.' 
+            else 'Ms.'
+         endif)
+-------------------------------
+
+context Membership
+inv: program.serviceLevel	->includes(actualLevel)
