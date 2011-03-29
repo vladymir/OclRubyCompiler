@@ -1,0 +1,222 @@
+import java_cup.runtime.*;
+import java_cup.runtime.Symbol;
+
+parser code {:
+    
+    public void report_error(String message, Object info) {
+   
+        StringBuffer m = new StringBuffer("Error");
+   
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+            if (s.left >= 0) {
+                /* Add to the end of the StringBuffer error message
+                   the line number of the error in the input. */
+                m.append(" in line "+(s.left+1));   
+                /* Check if the column number in the input is greater
+                   or equal to zero. */
+                if (s.right >= 0)                    
+                    /* Add to the end of the StringBuffer error message
+                       the column number of the error in the input. */
+                    m.append(", column "+(s.right+1));
+            }
+        }
+   
+        m.append(" : "+message);
+        System.err.println(m);
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+:};
+   
+terminal           COLON, DCOLON, PLUS, MINUS, MULT, DIVIDE, 
+				   LPAREN, RPAREN, LBRACK, RBRACK, LCURLY, RCURLY,
+				   COMMA, EQUAL, NEQUAL, RARROW,
+				   DOT, POUND, BAR, CONTEXT, BODY, PRE,
+				   POST, INV, SELECT, EXISTS, FOR_ALL, INCLUDING,
+				   EXCLUDING, OCL_IS_NEW, AT_PRE, RESULT, SIZE, STRING, SELF,
+				   IF, THEN, ELSE, IMPLIES, ENDIF, SET, TRUE, FALSE,
+				   AND, OR, XOR, NOT, NUMERO;
+
+terminal String ID, TYPE;
+terminal String RELOP;
+
+non terminal LiteralNode Literal;
+non terminal TypeNode TypeSpecifier;
+non terminal OperationArgumentsNode OperationArguments;
+non terminal Boolean BoolValue;
+non terminal String Type;
+non terminal String ArithmeticOperator, MultOperator, UnaryOperator,
+			 LogicalOperator;
+non terminal PathNode PathName;
+non terminal OclExpressionNode OclExpression, LogicalExpression,
+			 RelationalExpression, AdditiveExpression,
+			 MultiplicativeExpression, UnaryExpression,
+			 PrimaryExpression, ConditionalExpression,
+			 CollectionExpression;
+non terminal ContextBodyNode ContextBody;
+non terminal PrePostOrBodyNode PrePostOrBodyContext;
+non terminal InvariantNode InvContext;
+non terminal ContextNode ClassifierContext, OperationContext,
+			 ContextDecl;
+non terminal ConstraintNode ConstraintDecl, Constraint;
+non terminal PropertyCallNode PropertyCall;
+non terminal ParametersNode CollectionParameters, FormalParameters,
+			 FormalParameter;
+
+precedence left IMPLIES;
+precedence left XOR;
+precedence left OR;
+precedence left AND;
+precedence left EQUAL, NEQUAL;
+precedence left RELOP;
+precedence left IF, THEN, ELSE, ENDIF;
+precedence left PLUS, MINUS;
+precedence left MULT, DIVIDE;
+precedence left DOT, RARROW;
+
+start with Constraint;
+
+Constraint ::= ConstraintDecl:cd Constraint:c {: cd.addConstraint(c); :}
+			  | ConstraintDecl:cd {: RESULT = cd; :}
+			  ;
+
+ConstraintDecl ::= ContextDecl:cd ContextBody:cb {: RESULT = new ConstraintNode(cd, cb, cdleft, cdright); :}
+				  ;
+ContextDecl ::= CONTEXT OperationContext:o {: RESULT = o; :}
+			   | CONTEXT ClassifierContext:c {: RESULT = c; :}
+			   ;
+
+ContextBody ::= InvContext:i {: RESULT = i; :}
+			   | PrePostOrBodyContext:p {: RESULT = p; :}
+			   | InvContext:i ContextBody:c {: if (c == null) RESULT = i; else i.addContext(c); :}
+			   | PrePostOrBodyContext:p ContextBody:c {: p.addContext(c); :}
+			   ;
+
+InvContext ::= INV COLON OclExpression:o {: RESULT = new InvariantNode(null, o, oleft, oright); :}
+			  | INV ID:i COLON OclExpression:o {: RESULT = new InvariantNode(i, o, ileft, iright); :}
+			  ;
+
+PrePostOrBodyContext ::= PRE COLON OclExpression:o {: RESULT = new PrePostOrBodyNode(null, o, oleft, oright); :}
+				 		| PRE ID:i COLON OclExpression:o {: RESULT = new PrePostOrBodyNode(i, o, ileft, iright); :}
+				 		| POST COLON OclExpression:o {: RESULT = new PrePostOrBodyNode(null, o, oleft, oright); :}
+				 		| POST ID:i COLON OclExpression:o {: RESULT = new PrePostOrBodyNode(i, o, ileft, iright); :}
+				 		;
+
+OperationContext ::= ID:i DCOLON:d PropertyCall:p {: RESULT = new OperationContextNode(i, p, null, dleft, dright); :}
+					| ID:i DCOLON:d PropertyCall:p COLON TypeSpecifier:t {: RESULT = new OperationContextNode(i, p, t, dleft, dright); :}
+					;
+
+ClassifierContext ::= ID:i1 COLON:c ID:i2 {: RESULT = new ClassifierContextNode(i1, i2, cleft, cright); :}
+					 | ID:i {: RESULT = new ClassifierContextNode(i, null, ileft, iright); :}
+					 ;
+
+PathName ::= ID:i {: RESULT = new PathNode(null, i, ileft, iright); :}
+			| ID:i DOT PathName:p {: RESULT = new PathNode(i, p, ileft, iright); :}
+			| SELF:s {: RESULT = new PathNode(null, "self", sleft, sright); :}
+			;
+
+OclExpression ::= LogicalExpression:l {: RESULT = l; :}
+				 ;
+
+LogicalExpression ::= RelationalExpression:r {: RESULT = r; :}
+					 | RelationalExpression:re LogicalOperator:lo LogicalExpression:le {: RESULT = new ConditionalExprNode(re, lo, le, leleft, leright); :}
+					 ;
+
+RelationalExpression ::= AdditiveExpression:a {: RESULT = a; :}
+						| AdditiveExpression:ae RELOP:r RelationalExpression:re {: RESULT = new RelationalExprNode(ae, r, re, rleft, rright); :}
+						;
+
+AdditiveExpression ::= MultiplicativeExpression:m {: RESULT = m; :}
+					  | MultiplicativeExpression:me ArithmeticOperator:ao AdditiveExpression:ae {: RESULT = new AddExprNode(me, ao, ae, aoleft, aoright); :}
+					  ;
+
+MultiplicativeExpression ::= UnaryExpression:u {: RESULT = u; :}
+							| UnaryExpression:ue MultOperator:mo MultiplicativeExpression:me {: RESULT = new MultExprNode(ue, mo, me, moleft, moright); :}
+							;
+
+UnaryExpression ::= PrimaryExpression:p {: RESULT = p; :}
+				   | UnaryOperator:uo UnaryExpression:ue {: RESULT = new UnaryExprNode(uo, ue, uoleft, uoright); :}
+				   //| PrimaryExpression:pe UnaryOperator:uo UnaryExpression:ue
+				   ;
+
+PrimaryExpression ::= Literal:l {: RESULT = l; :}
+					 | ConditionalExpression:c {: RESULT = c; :}
+					 | LPAREN OclExpression:o RPAREN {: RESULT = o; :}
+					 | CollectionExpression:c {: RESULT = c; :}
+					 ;
+
+Literal ::= NUMERO:n {: RESULT = new LiteralNode(n, nleft, nright); :}
+		   | BoolValue:b {: RESULT = new LiteralNode(b, bleft, bright); :}
+		   | STRING:s {: RESULT = new LiteralNode(new StringNode(s.toString(), sleft, sright), sleft, sright); :}
+		   | PropertyCall:p {: RESULT = new LiteralNode(p, pleft, pright); :}
+		   | PropertyCall:p AT_PRE {: RESULT = new LiteralNode(new AtPreNode(p, pleft, pright), pleft, pright); :}
+	 	   ;
+
+ConditionalExpression ::= IF OclExpression:i
+				 THEN OclExpression:t
+				 ELSE OclExpression:e
+				 ENDIF {: RESULT = new IfThenElseNode(i, t, e, ileft, iright); :} 
+				;
+
+CollectionExpression ::= SELECT OperationArguments:o {: RESULT = new SelectOperationNode(o, oleft, oright); :}
+						| EXISTS OperationArguments:o {: RESULT = new ExistsOperationNode(o, oleft, oright); :}
+						| INCLUDING OperationArguments:o {: RESULT = new IncludingOperationNode(o, oleft, oright); :}
+						| EXCLUDING OperationArguments:o {: RESULT = new ExcludingOperationNode(o, oleft, oright); :}
+						| FOR_ALL OperationArguments:o {: RESULT = new ForAllOperationNode(o, oleft, oright); :}
+						| SIZE:s LPAREN RPAREN {: RESULT = new SizeOperationNode(sleft, sright); :}
+						;
+
+OperationArguments ::= /*LPAREN CollectionParameters:c DCOLON TypeSpecifier:t BAR OclExpression:o RPAREN
+					  |*/ LPAREN CollectionParameters:c BAR OclExpression:o RPAREN
+					  | LPAREN OclExpression:o RPAREN
+					  ;
+
+CollectionParameters ::= PropertyCall:p {: RESULT = new CollectionParametersNode(p, pleft, pright); :}
+						| PropertyCall:p COMMA CollectionParameters:c {: c.addPropertyCall(p); :}
+						;
+
+TypeSpecifier ::= PathName:p {: RESULT = new TypeNode(p, pleft, pright); :}
+				 | TYPE:t {: RESULT = new TypeNode(t, tleft, tright); :}
+				 ;
+
+PropertyCall ::= RESULT:r {: RESULT = new PropertyCallNode(new PathNode(null, "result", rleft, rright), rleft, rright); :}
+				| PathName:p {: RESULT = new PropertyCallNode(p, pleft, pright); :}
+				| PathName:p LPAREN FormalParameters:f RPAREN
+				| PathName:p DOT PropertyCall:pc
+				;
+
+FormalParameters ::= FormalParameters:f1 COMMA FormalParameter:f2 {: f1.addParameter(f2); :}
+					| FormalParameter:f {: RESULT = new FormalParameterNode(f, fleft, fright); :}
+					|
+					;
+
+FormalParameter ::= ID:i COLON TypeSpecifier:t
+				   | PropertyCall:p
+				   ;
+
+BoolValue ::= TRUE {: RESULT = true; :}
+			 | FALSE {: RESULT = false; :}
+			 ;
+
+LogicalOperator ::= AND {: RESULT = "and"; :}
+				   | OR {: RESULT = "or"; :}
+				   | XOR {: RESULT = "xor"; :}
+				   | IMPLIES {: RESULT = "implies"; :}
+				   ;
+
+ArithmeticOperator ::= PLUS {: RESULT = "+"; :}
+				      | MINUS {: RESULT = "-"; :}
+				      ;
+
+MultOperator ::= MULT {: RESULT = "*"; :}
+				| DIVIDE {: RESULT = "/"; :}
+				;
+
+UnaryOperator ::= NOT {: RESULT = "not"; :}
+				 | MINUS {: RESULT = "-"; :}
+				 | RARROW {: RESULT = "->"; :}
+				 ;

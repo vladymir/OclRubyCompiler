@@ -55,22 +55,56 @@ terminal String ID;
 terminal Integer   NUMERO;
 
 non terminal Object ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
-non terminal Object ExpOcl, InvContext;
+non terminal Object ExpOcl, InvContext, ExpPrimaria, Literal;
 non terminal Object ExpLogica, OperadorLogico, OperadorRelacional;
-
+non terminal Object EnumLiteral, EnumOpt, ExpRelacional;
+non terminal Object ExpAditiva, ExpMultiplicativa, ExpUnaria, OperadorMais,OperadorMulti;
+non terminal Object ExpLogicaAux, ExpRelacionalAux, ExpAditivaAux, ExpMultiAux; 
+non terminal Object OperadorUnario, ExpPosFixada;
 
 ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}| ;
 
-Restricao     ::= DeclaracaoContexto InvContext;
+Restricao     ::= DeclaracaoContexto InvContext {:System.out.println(" Restricao ");:};
 
-DeclaracaoContexto ::= CONTEXT ClassifierContexto;
+DeclaracaoContexto ::= CONTEXT ClassifierContexto {:System.out.println(" DeclaracaoContexto ");:}; 
 
 ClassifierContexto ::= ID | ID COLON ID ;
 
-InvContext	::= INV COLON ExpOcl| INV ID COLON /*Expressao OCL*/ ;
+InvContext	::= INV COLON ExpOcl {:System.out.println(" invariante ");:} InvContext 
+				| 
+				INV ID COLON ExpOcl {:System.out.println(" invariante ");:} InvContext 
+				| ;
 
-ExpOcl ::= ExpLogica;
+/*ExpOcl ::= ExpLogica {:System.out.println(" ExpressaoOcl ");:};*/
+ExpOcl ::= ExpLogica ;
+
+ExpLogica ::= ExpRelacional ExpLogicaAux {:System.out.println(" ExpressaoLogica ");:};
+
+ExpLogicaAux ::= | OperadorLogico ExpRelacional ExpLogicaAux  ;
+
+ExpRelacional ::= ExpAditiva ExpRelacionalAux {:System.out.println(" ExpressaoRelacional ");:};
+
+ExpRelacionalAux ::= | OperadorRelacional ExpAditiva ExpRelacionalAux  ;
+
+ExpAditiva ::= ExpMultiplicativa ExpAditivaAux {:System.out.println(" ExpressaoAditiva ");:};
+
+ExpAditivaAux ::= | OperadorMais ExpMultiplicativa ExpAditivaAux  ;
+
+ExpMultiplicativa ::= ExpUnaria ExpMultiAux {:System.out.println(" ExpressaoMulti ");:};
+
+ExpMultiAux ::= | OperadorMulti ExpUnaria ExpMultiAux ;
+
+ExpUnaria ::= OperadorUnario ExpPosFixada | ExpPosFixada {:System.out.println(" ExpressaoPostfix ");:};
+
+ExpPosFixada ::= ExpPrimaria {:System.out.println(" Expressao Primaria ");:};
 
 
+ExpPrimaria ::= Literal{:System.out.println(" literal ");:};
+
+Literal ::= STRING | NUMERO ;
+
+OperadorMais ::= PLUS | MINUS ;
+OperadorMulti ::= MULT | DIVIDE ;
+OperadorUnario ::= MINUS | NOT ;
 OperadorLogico ::= AND | OR | XOR | IMPLIES;
 OperadorRelacional ::= EQUAL | GT | LT | GE | LE | NEQUAL;
