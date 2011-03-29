@@ -26,15 +26,22 @@ inv DataValue_WFR_1:
 	(self.classifier->size = 1) and self.classifier->forAll(oclIsKindOf(DataType))
 -------------------------------
 
-inv Instance_WFR_3:
+context Instance inv Instance_WFR_3:
 --   If two operations have the same operations they must be the same
 
 	self.classifier->forAll( c1, c2| c1.allOperations->forAll( op1| c2.allOperations->forAll( op2| op1.hasSameSignature(op2)
 		implies op1 = op2)))
 -------------------------------
+
 context Instance inv Actor_WFR_1:
 --   [1] Actors can only have Associations to UseCases, Subsystems, and Classes and these Associations are binary.
 
 	self.associations->forAll(a| a.connection->size = 2 and a.allConnections->exists(r| r.participant.oclIsKindOf(Actor)) and
 	a.allConnections->exists(r| r.participant.oclIsKindOf(UseCase) or r.participant.oclIsKindOf(Subsystem) or
 	r.participant.oclIsKindOf(Class)))
+-------------------------------
+
+context UseCase inv UseCase_WFR_4:
+--   [4] The names of the ExtensionPoints must be unique within the UseCase.
+
+	self.allExtensionPoints->forAll(x, y| x.name = y.name implies x = y) 
