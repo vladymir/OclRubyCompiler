@@ -96,10 +96,26 @@ ExpMultiAux ::= | OperadorMulti ExpUnaria ExpMultiAux ;
 
 ExpUnaria ::= OperadorUnario ExpPosFixada | ExpPosFixada {:System.out.println(" ExpressaoPostfix ");:};
 
-ExpPosFixada ::= ExpPrimaria {:System.out.println(" Expressao Primaria ");:};
+ExpPosFixada ::= ExpPrimaria ExpPosFixadaAux {:System.out.println(" Expressao Primaria ");:};
 
+ExpPosFixadaAux ::= | (DOT | RARROW) ChamadaPropriedade ExpPosFixadaAux ;
 
-ExpPrimaria ::= Literal{:System.out.println(" literal ");:};
+ExpPrimaria ::= Literal | ChamadaPropriedade | LPAREN  ExpOcl RPAREN 
+					| ExpressaoIf {:System.out.println(" expressao primaria ");:};
+
+ChamadaPropriedade ::= Caminho ( ParametrosChamadaPropriedade | ) ;
+
+ParametrosChamadaPropriedade ::= LPAREN (Declarador | ) (ListaParametros | ) RPAREN ;
+
+Declarador ::= ID DeclaradorAux (SEMICOL ID COLON EspecificadorTipo EQUAL ExpOcl | ) BAR ;
+
+EspecificadorTipo ::= EspecificadorTipoSimples
+
+EspecificadorTipoSimples ::= Caminho ;
+
+Caminho ::= ID CaminhoAux ;
+
+CaminhoAux ::= DCOLON ID CaminhoAux ;
 
 Literal ::= STRING | NUMERO ;
 
