@@ -53,11 +53,14 @@ terminal Integer   NUMERO;
 
 non terminal Object ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
 non terminal Object ExpOcl, InvContext, ExpPrimaria, Literal;
-non terminal Object ExpLogica, OperadorLogico, OperadorRelacional;
-non terminal Object EnumLiteral, EnumOpt, ExpRelacional;
+non terminal Object ExpLogica, OperadorLogico, OperadorRelacional, ExpRelacional;
 non terminal Object ExpAditiva, ExpMultiplicativa, ExpUnaria, OperadorMais,OperadorMulti;
 non terminal Object ExpLogicaAux, ExpRelacionalAux, ExpAditivaAux, ExpMultiAux; 
-non terminal Object OperadorUnario, ExpPosFixada;
+non terminal Object OperadorUnario, ExpPosFixada, ExpPosFixadaAux, DotOrArrow;
+non terminal Object ChamadaPropriedade, ExpressaoIf, Caminho;
+non terminal Object ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeOpt;
+non terminal Object DeclaradorOpt, ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
+non terminal Object EspecificadorTipoOpt, EspecificadorTipo, EspecificadorTipoSimples, CaminhoAux;
 
 ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}| ;
 
@@ -93,24 +96,34 @@ ExpMultiAux ::= | OperadorMulti ExpUnaria ExpMultiAux ;
 
 ExpUnaria ::= OperadorUnario ExpPosFixada | ExpPosFixada {:System.out.println(" ExpressaoPostfix ");:};
 
-ExpPosFixada ::= ExpPrimaria ExpPosFixadaAux {:System.out.println(" Expressao Primaria ");:};
+ExpPosFixada ::= ExpPrimaria ExpPosFixadaAux ;
 
-ExpPosFixadaAux ::= | (DOT | RARROW) ChamadaPropriedade ExpPosFixadaAux ;
+ExpPosFixadaAux ::= DotOrArrow ChamadaPropriedade ExpPosFixadaAux | ;
+
+DotOrArrow ::= DOT | RARROW ;
 
 ExpPrimaria ::= Literal | ChamadaPropriedade | LPAREN  ExpOcl RPAREN 
-					| ExpressaoIf {:System.out.println(" expressao primaria ");:};
+					| ExpressaoIf ;
 
 ExpressaoIf ::= IF ExpOcl THEN ExpOcl ELSE ExpOcl ENDIF ;
 
-ChamadaPropriedade ::= Caminho ( ParametrosChamadaPropriedade | ) ;
+ChamadaPropriedade ::= Caminho ParametrosChamadaPropriedadeOpt ;
 
-ParametrosChamadaPropriedade ::= LPAREN (Declarador | ) (ListaParametros | ) RPAREN ;
+ParametrosChamadaPropriedadeOpt ::= ParametrosChamadaPropriedade | ;
 
-Declarador ::= ID DeclaradorAux (SEMICOL ID COLON EspecificadorTipo EQUAL ExpOcl | ) BAR ;
+ParametrosChamadaPropriedade ::= LPAREN DeclaradorOpt ListaParametrosOpt RPAREN ;
+
+DeclaradorOpt ::= Declarador | ;
+
+ListaParametrosOpt ::= ListaParametros | ;
+
+Declarador ::= ID DeclaradorAux EspecificadorTipoOpt BAR ;
+
+EspecificadorTipoOpt ::= SEMICOL ID COLON EspecificadorTipo EQUAL ExpOcl | ;
 
 DeclaradorAux ::= COMMA ID DeclaradorAux ;
 
-EspecificadorTipo ::= EspecificadorTipoSimples
+EspecificadorTipo ::= EspecificadorTipoSimples ;
 
 EspecificadorTipoSimples ::= Caminho ;
 
@@ -123,5 +136,5 @@ Literal ::= STRING | NUMERO ;
 OperadorMais ::= PLUS | MINUS ;
 OperadorMulti ::= MULT | DIVIDE ;
 OperadorUnario ::= MINUS | NOT ;
-OperadorLogico ::= AND | OR | XOR | IMPLIES;
-OperadorRelacional ::= EQUAL | GT | LT | GE | LE | NEQUAL;
+OperadorLogico ::= AND | OR | XOR | IMPLIES ;
+OperadorRelacional ::= EQUAL | GT | LT | GE | LE | NEQUAL ;
