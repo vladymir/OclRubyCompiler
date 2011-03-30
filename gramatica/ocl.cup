@@ -43,13 +43,10 @@ parser code {:
    that do have an value, in this case an integer value, are listed on
    the next line down. */
 
-terminal           SEMI, DCOLON,AND,NOT,XOR,COLON, PLUS, MINUS, MULT, DIVIDE, 
-				   LPAREN, OR,RPAREN, LBRACK, RBRACK, LCURLY, RCURLY,
-				   COMMA, EQUAL, NEQUAL, LT, GT, LE, GE, RARROW, DOTDOT,
-				   DOT, POUND, SEMICOL, BAR, ATSIGN, CONTEXT, 
-				   INV, SELECT, EXISTS, FOR_ALL, INCLUDING,
-				   EXCLUDING, OCL_IS_NEW,SIZE, STRING, TYPE, SELF,
-				   IF, THEN, ELSE, RELOP, IMPLIES, ENDIF, SET, TRUE, FALSE,ANY;
+terminal		CONTEXT, INV, OR, XOR, AND, NOT, LT, GT, LE, GE, EQUAL, NEQUAL,
+				PLUS, MINUS, MULT, DIVIDE, SEMICOL, COLON, DCOLON,
+				LPAREN, RPAREN, COMMA, RARROW,DOT, BAR,
+				STRING, IF, THEN, ELSE, ENDIF, IMPLIES;
 
 terminal String ID;
 terminal Integer   NUMERO;
@@ -103,11 +100,15 @@ ExpPosFixadaAux ::= | (DOT | RARROW) ChamadaPropriedade ExpPosFixadaAux ;
 ExpPrimaria ::= Literal | ChamadaPropriedade | LPAREN  ExpOcl RPAREN 
 					| ExpressaoIf {:System.out.println(" expressao primaria ");:};
 
+ExpressaoIf ::= IF ExpOcl THEN ExpOcl ELSE ExpOcl ENDIF ;
+
 ChamadaPropriedade ::= Caminho ( ParametrosChamadaPropriedade | ) ;
 
 ParametrosChamadaPropriedade ::= LPAREN (Declarador | ) (ListaParametros | ) RPAREN ;
 
 Declarador ::= ID DeclaradorAux (SEMICOL ID COLON EspecificadorTipo EQUAL ExpOcl | ) BAR ;
+
+DeclaradorAux ::= COMMA ID DeclaradorAux ;
 
 EspecificadorTipo ::= EspecificadorTipoSimples
 
