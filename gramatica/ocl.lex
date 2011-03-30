@@ -23,41 +23,41 @@ import static compil.inv.parser.OclSym.*;
     }
 %}
 LineTerminator		= \r|\n|\r\n
-LPAREN					= \(
-RPAREN				= \)
-LBRACK					= \[
-RBRACK				= \]
-LCURLY					= \{
-RCURLY					= \}
-COLON					= :
-DCOLON				= ::
-COMMA					= ,
-EQUAL					= \=
-NEQUAL				= <>
-LT						= <
-GT						= >
-LE							= <=
-GE						= >=
-RARROW				= ->
-DOT						= \.
-POUND					= #
-SEMICOL				= ;
-BAR						= \|
-PLUS						= \+
-MINUS					= \-
-MULT					= \*
-DIVIDE					= \/
-NEQUAL				= <>
-RELOP					= {LT}|{GT}|{LE}|{GE}|{NEQUAL}
-LETRA 					= [a-zA-Z]
-DIGITO					= [0-9]
-INTEIRO				= {DIGITO}+
-NUM_OPT				= ({DOT}{DIGITO}+)?((e|E)(PLUS|MINUS)?{DIGITO}+)?
-NUMERO				= {INTEIRO}{NUM_OPT}
-TYPE						= String|Integer|Boolean|Real
-ID							= {LETRA}({LETRA}|{NUMERO})*{MULT}?
-STRING					= \"({LETRA}|{NUMERO})*\"
-WhiteSpace			= {LineTerminator} | [ \t\f]
+LPAREN			= \(
+RPAREN			= \)
+LBRACK			= \[
+RBRACK			= \]
+LCURLY			= \{
+RCURLY			= \}
+COLON			= :
+DCOLON			= ::
+COMMA			= ,
+EQUAL			= \=
+NEQUAL			= <>
+LT				= <
+GT				= >
+LE				= <=
+GE				= >=
+RARROW			= ->
+DOT				= \.
+POUND			= #
+SEMICOL			= ;
+BAR				= \|
+PLUS				= \+
+MINUS			= \-
+MULT			= \*
+DIVIDE			= \/
+NEQUAL			= <>
+RELOP			= {LT}|{GT}|{LE}|{GE}|{NEQUAL}
+LETRA 			= [a-zA-Z]
+DIGITO			= [0-9]
+INTEIRO			= {DIGITO}+
+NUM_OPT			= ({DOT}{DIGITO}+)?((e|E)(PLUS|MINUS)?{DIGITO}+)?
+NUMERO			= {INTEIRO}{NUM_OPT}
+TYPE				= String|Integer|Boolean|Real
+ID				= {LETRA}({LETRA}|{NUMERO})*{MULT}?
+STRING			= \"({LETRA}|{NUMERO})*\"
+WhiteSpace		= {LineTerminator} | [ \t\f]
 
 
 %%
