@@ -46,18 +46,23 @@ parser code {:
 terminal		CONTEXT, INV, OR, XOR, AND, NOT, LT, GT, LE, GE, EQUAL, NEQUAL,
 				PLUS, MINUS, MULT, DIVIDE, SEMICOL, COLON, DCOLON,
 				LPAREN, RPAREN, COMMA, RARROW,DOT, BAR,
-				STRING, IF, THEN, ELSE, ENDIF, IMPLIES;
+				STRING, IF, THEN, ELSE, ENDIF, IMPLIES,SIZE,INCLUDES,EXCLUDES,FORALL,SELECT,EXISTS,
+				RCOL,LCOL,INCLUDESALL;
 
 terminal String ID;
 terminal Integer   NUMERO;
 
 non terminal Object ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
 non terminal Object ExpOcl, InvContext, ExpPrimaria, Literal;
-non terminal Object ExpLogica, OperadorLogico, OperadorRelacional;
-non terminal Object EnumLiteral, EnumOpt, ExpRelacional;
+non terminal Object ExpLogica, OperadorLogico, OperadorRelacional, ExpRelacional;
 non terminal Object ExpAditiva, ExpMultiplicativa, ExpUnaria, OperadorMais,OperadorMulti;
 non terminal Object ExpLogicaAux, ExpRelacionalAux, ExpAditivaAux, ExpMultiAux; 
-non terminal Object OperadorUnario, ExpPosFixada;
+non terminal Object OperadorUnario, ExpPosFixada, ExpPosFixadaAux, DotOrArrow;
+non terminal Object ChamadaPropriedade, ExpressaoIf, Caminho;
+non terminal Object ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeOpt;
+non terminal Object DeclaradorOpt, ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
+non terminal Object EspecificadorTipoOpt, EspecificadorTipo, EspecificadorTipoSimples, CaminhoAux;
+non terminal Object OperadorColecao,Qualificadores,ChamadaPropriedadeColecao,QualificadoresOpt;
 
 ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}| ;
 
@@ -72,56 +77,94 @@ InvContext	::= INV COLON ExpOcl {:System.out.println(" invariante ");:} InvConte
 				INV ID COLON ExpOcl {:System.out.println(" invariante ");:} InvContext 
 				| ;
 
-/*ExpOcl ::= ExpLogica {:System.out.println(" ExpressaoOcl ");:};*/
 ExpOcl ::= ExpLogica ;
 
-ExpLogica ::= ExpRelacional ExpLogicaAux {:System.out.println(" ExpressaoLogica ");:};
+ExpLogica ::= ExpRelacional 
+              |
+              ExpRelacional OperadorLogico ExpLogica {:System.out.println(" ExpressaoLogica ");:}
+              ;
 
-ExpLogicaAux ::= | OperadorLogico ExpRelacional ExpLogicaAux  ;
+ExpRelacional ::= ExpAditiva {:System.out.println(" ExpAditiva ");:}
+				  |
+				  ExpAditiva OperadorRelacional ExpAditiva {:System.out.println(" ExpAditiva < ExpAditiva ");:}
+				  ;
 
-ExpRelacional ::= ExpAditiva ExpRelacionalAux {:System.out.println(" ExpressaoRelacional ");:};
 
-ExpRelacionalAux ::= | OperadorRelacional ExpAditiva ExpRelacionalAux  ;
+ExpAditiva ::= ExpMultiplicativa ExpAditivaAux ; /*ID | NUMERO;*/
 
-ExpAditiva ::= ExpMultiplicativa ExpAditivaAux {:System.out.println(" ExpressaoAditiva ");:};
+ExpAditivaAux ::= ExpAditivaAux OperadorMais ExpMultiplicativa |  ;
 
-ExpAditivaAux ::= | OperadorMais ExpMultiplicativa ExpAditivaAux  ;
+ExpMultiplicativa ::= ExpUnaria ExpMultiAux ;
 
-ExpMultiplicativa ::= ExpUnaria ExpMultiAux {:System.out.println(" ExpressaoMulti ");:};
 
-ExpMultiAux ::= | OperadorMulti ExpUnaria ExpMultiAux ;
+ExpMultiAux ::= ExpMultiAux OperadorMulti ExpUnaria |  ;
 
 ExpUnaria ::= OperadorUnario ExpPosFixada | ExpPosFixada {:System.out.println(" ExpressaoPostfix ");:};
 
-ExpPosFixada ::= ExpPrimaria ExpPosFixadaAux {:System.out.println(" Expressao Primaria ");:};
+ExpPosFixada ::= ExpPrimaria ExpPosFixadaAux {:System.out.println("Exp UNARIA");:};
 
-ExpPosFixadaAux ::= | (DOT | RARROW) ChamadaPropriedade ExpPosFixadaAux ;
+ExpPosFixadaAux ::= ExpPosFixadaAux DOT ChamadaPropriedade {:System.out.println("postfix.propertycall");:}
+				    |
+				    ExpPosFixadaAux RARROW {:System.out.println("postfix->");:} ChamadaPropriedadeColecao {:System.out.println("postfix->propertycollectioncall");:}
+				    |
+				    ; 
 
-ExpPrimaria ::= Literal | ChamadaPropriedade | LPAREN  ExpOcl RPAREN 
-					| ExpressaoIf {:System.out.println(" expressao primaria ");:};
+ExpPrimaria ::= Literal | ChamadaPropriedade {:System.out.println("PropertyCall");:}| LPAREN  ExpOcl RPAREN 
+					| ExpressaoIf ;
 
 ExpressaoIf ::= IF ExpOcl THEN ExpOcl ELSE ExpOcl ENDIF ;
 
-ChamadaPropriedade ::= Caminho ( ParametrosChamadaPropriedade | ) ;
 
-ParametrosChamadaPropriedade ::= LPAREN (Declarador | ) (ListaParametros | ) RPAREN ;
 
-Declarador ::= ID DeclaradorAux (SEMICOL ID COLON EspecificadorTipo EQUAL ExpOcl | ) BAR ;
+ChamadaPropriedadeColecao ::= OperadorColecao QualificadoresOpt ParametrosChamadaPropriedadeOpt 
+								;
+							  
 
-DeclaradorAux ::= COMMA ID DeclaradorAux ;
+ChamadaPropriedade ::= Caminho {:System.out.println("Path");:} QualificadoresOpt ParametrosChamadaPropriedadeOpt                                                                    
+                       ;
 
-EspecificadorTipo ::= EspecificadorTipoSimples
+Qualificadores ::= LCOL ListaParametros RCOL {:System.out.println("Qualificadores");:} ; 
+
+QualificadoresOpt ::= Qualificadores | ;
+ 
+ParametrosChamadaPropriedadeOpt ::= ParametrosChamadaPropriedade | ; 
+
+ParametrosChamadaPropriedade ::= LPAREN  Declarador ExpOcl RPAREN 	 
+								 |
+								  LPAREN ExpOcl RPAREN
+								 |
+								 LPAREN RPAREN
+								 ;
+
+DeclaradorOpt ::= Declarador {:System.out.println("DeclaradorOpt");:} | ;
+ 
+ListaParametros ::= ExpOcl ListaParametrosOpt ;
+ListaParametrosOpt ::= COMMA ExpOcl ListaParametrosOpt | ; 
+
+Declarador ::= ID {:System.out.println("ID");:}DeclaradorAux EspecificadorTipoOpt BAR  ;
+
+EspecificadorTipoOpt ::= SEMICOL ID COLON EspecificadorTipo EQUAL ExpOcl 
+                         |
+                         COLON ID
+                         |
+                          ;
+
+DeclaradorAux ::= COMMA ID DeclaradorAux | ;
+
+EspecificadorTipo ::= EspecificadorTipoSimples ;
 
 EspecificadorTipoSimples ::= Caminho ;
 
 Caminho ::= ID CaminhoAux ;
 
-CaminhoAux ::= DCOLON ID CaminhoAux ;
+CaminhoAux ::= DCOLON ID CaminhoAux | ;
 
 Literal ::= STRING | NUMERO ;
 
+
+OperadorColecao ::= INCLUDESALL | SIZE | INCLUDES | EXCLUDES | EXISTS | SELECT | FORALL ;
 OperadorMais ::= PLUS | MINUS ;
 OperadorMulti ::= MULT | DIVIDE ;
 OperadorUnario ::= MINUS | NOT ;
-OperadorLogico ::= AND | OR | XOR | IMPLIES;
-OperadorRelacional ::= EQUAL | GT | LT | GE | LE | NEQUAL;
+OperadorLogico ::= AND | OR | XOR | IMPLIES ;
+OperadorRelacional ::= EQUAL | GT | LT | GE | LE | NEQUAL ;

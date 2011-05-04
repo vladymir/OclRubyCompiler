@@ -25,6 +25,8 @@ import static compil.inv.parser.OclSym.*;
 LineTerminator		= \r|\n|\r\n
 LPAREN			= \(
 RPAREN			= \)
+RCOL			= \]
+LCOL			= \[
 SEMICOL			= ;
 COLON			= :
 DCOLON			= ::
@@ -87,12 +89,21 @@ WhiteSpace		= {LineTerminator} | [ \t\f]
 {BAR} { return symbol(OclSym.BAR); }
 {RARROW} { return symbol(OclSym.RARROW); }
 {DOT} { return symbol(OclSym.DOT); }
-
+{RCOL} { return symbol(OclSym.RCOL); }
+{LCOL} { return symbol(OclSym.LCOL); }
 "if" { return symbol(OclSym.IF); }
 "then" { return symbol(OclSym.THEN); }
 "else" { return symbol(OclSym.ELSE); }
 "endif" { return symbol(OclSym.ENDIF); }
 "implies" { return symbol(OclSym.IMPLIES); }
+
+"size" { return symbol(OclSym.SIZE); }
+"includes" { return symbol(OclSym.INCLUDES); }
+"excludes" { return symbol(OclSym.EXCLUDES); }
+"forAll" { System.out.println("FORALL");return symbol(OclSym.FORALL); }
+"select" { return symbol(OclSym.SELECT); }
+"exists" { return symbol(OclSym.EXISTS); }
+"includesAll" { return symbol(OclSym.INCLUDESALL); }
 
 {STRING} { return symbol(OclSym.STRING, yytext()); }
 {ID} { return symbol(OclSym.ID, yytext()); }
