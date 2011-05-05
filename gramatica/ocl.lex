@@ -1,10 +1,9 @@
 package compil.inv.parser;
 
 import java_cup.runtime.*;
-import java.io.IOException;
 
-import compil.inv.parser.OclSym;
-import static compil.inv.parser.OclSym.*;
+import compil.inv.parser.OCL_Sym;
+import static compil.inv.parser.OCL_Sym.*;
 
 %%
 %class OCL_Lexer
@@ -21,7 +20,14 @@ import static compil.inv.parser.OclSym.*;
     private Symbol symbol(int type, Object value) {
         return new Symbol(type, yyline, yycolumn, value);
     }
+
 %}
+
+
+%eofval{
+  return new java_cup.runtime.Symbol(OCL_Sym.EOF);
+%eofval}
+
 LineTerminator		= \r|\n|\r\n
 LPAREN			= \(
 RPAREN			= \)
@@ -60,54 +66,54 @@ WhiteSpace		= {LineTerminator} | [ \t\f]
 %%
 /* ------------------------Lexical Rules Section---------------------- */
    
-"context" { return symbol(OclSym.CONTEXT); }
-"inv" { return symbol(OclSym.INV); }
+"context" { return symbol(OCL_Sym.CONTEXT); }
+"inv" { return symbol(OCL_Sym.INV); }
 
-"or" { return symbol(OclSym.OR); }
-"xor" { return symbol(OclSym.XOR); }
-"and" { return symbol(OclSym.AND); }
-"not" { return symbol(OclSym.NOT); }
+"or" { return symbol(OCL_Sym.OR); }
+"xor" { return symbol(OCL_Sym.XOR); }
+"and" { return symbol(OCL_Sym.AND); }
+"not" { return symbol(OCL_Sym.NOT); }
 
-{LT} { return symbol(OclSym.LT); }
-{GT} { return symbol(OclSym.GT); }
-{LE} { return symbol(OclSym.LE); }
-{GE} { return symbol(OclSym.GE); }
-{EQUAL} { return symbol(OclSym.EQUAL); }
-{NEQUAL} { return symbol(OclSym.NEQUAL); }
+{LT} { return symbol(OCL_Sym.LT); }
+{GT} { return symbol(OCL_Sym.GT); }
+{LE} { return symbol(OCL_Sym.LE); }
+{GE} { return symbol(OCL_Sym.GE); }
+{EQUAL} { return symbol(OCL_Sym.EQUAL); }
+{NEQUAL} { return symbol(OCL_Sym.NEQUAL); }
 
-{PLUS} { return symbol(OclSym.PLUS); }
-{MINUS} { return symbol(OclSym.MINUS); }
-{MULT} { return symbol(OclSym.MULT); }
-{DIVIDE} { return symbol(OclSym.DIVIDE); }
+{PLUS} { return symbol(OCL_Sym.PLUS); }
+{MINUS} { return symbol(OCL_Sym.MINUS); }
+{MULT} { return symbol(OCL_Sym.MULT); }
+{DIVIDE} { return symbol(OCL_Sym.DIVIDE); }
 
-{SEMICOL} { return symbol(OclSym.SEMICOL); }
-{COLON} { return symbol(OclSym.COLON); }
-{DCOLON} { return symbol(OclSym.DCOLON); }
-{LPAREN} { return symbol(OclSym.LPAREN); }
-{RPAREN} { return symbol(OclSym.RPAREN); }
-{COMMA} { return symbol(OclSym.COMMA); }
-{BAR} { return symbol(OclSym.BAR); }
-{RARROW} { return symbol(OclSym.RARROW); }
-{DOT} { return symbol(OclSym.DOT); }
-{RCOL} { return symbol(OclSym.RCOL); }
-{LCOL} { return symbol(OclSym.LCOL); }
-"if" { return symbol(OclSym.IF); }
-"then" { return symbol(OclSym.THEN); }
-"else" { return symbol(OclSym.ELSE); }
-"endif" { return symbol(OclSym.ENDIF); }
-"implies" { return symbol(OclSym.IMPLIES); }
+{SEMICOL} { return symbol(OCL_Sym.SEMICOL); }
+{COLON} { return symbol(OCL_Sym.COLON); }
+{DCOLON} { return symbol(OCL_Sym.DCOLON); }
+{LPAREN} { return symbol(OCL_Sym.LPAREN); }
+{RPAREN} { return symbol(OCL_Sym.RPAREN); }
+{COMMA} { return symbol(OCL_Sym.COMMA); }
+{BAR} { return symbol(OCL_Sym.BAR); }
+{RARROW} { return symbol(OCL_Sym.RARROW); }
+{DOT} { return symbol(OCL_Sym.DOT); }
+{RCOL} { return symbol(OCL_Sym.RCOL); }
+{LCOL} { return symbol(OCL_Sym.LCOL); }
+"if" { return symbol(OCL_Sym.IF); }
+"then" { return symbol(OCL_Sym.THEN); }
+"else" { return symbol(OCL_Sym.ELSE); }
+"endif" { return symbol(OCL_Sym.ENDIF); }
+"implies" { return symbol(OCL_Sym.IMPLIES); }
 
-"size" { return symbol(OclSym.SIZE); }
-"includes" { return symbol(OclSym.INCLUDES); }
-"excludes" { return symbol(OclSym.EXCLUDES); }
-"forAll" { System.out.println("FORALL");return symbol(OclSym.FORALL); }
-"select" { return symbol(OclSym.SELECT); }
-"exists" { return symbol(OclSym.EXISTS); }
-"includesAll" { return symbol(OclSym.INCLUDESALL); }
+"size" { return symbol(OCL_Sym.SIZE); }
+"includes" { return symbol(OCL_Sym.INCLUDES); }
+"excludes" { return symbol(OCL_Sym.EXCLUDES); }
+"forAll" { System.out.println("FORALL");return symbol(OCL_Sym.FORALL); }
+"select" { return symbol(OCL_Sym.SELECT); }
+"exists" { return symbol(OCL_Sym.EXISTS); }
+"includesAll" { return symbol(OCL_Sym.INCLUDESALL); }
 
-{STRING} { return symbol(OclSym.STRING, yytext()); }
-{ID} { return symbol(OclSym.ID, yytext()); }
-{NUMERO} { return symbol(OclSym.NUMERO, yytext());}
+{STRING} { return symbol(OCL_Sym.STRING, yytext()); }
+{ID} { return symbol(OCL_Sym.ID, yytext()); }
+{NUMERO} { return symbol(OCL_Sym.NUMERO, yytext());}
 
 {WhiteSpace} { }
 {LineTerminator} { }

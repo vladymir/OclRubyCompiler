@@ -1,6 +1,7 @@
 package compil.inv.parser;
 
 import java_cup.runtime.*;
+import compil.inv.semantica.No;
 
 parser code {:
     
@@ -52,17 +53,17 @@ terminal		CONTEXT, INV, OR, XOR, AND, NOT, LT, GT, LE, GE, EQUAL, NEQUAL,
 terminal String ID;
 terminal Integer   NUMERO;
 
-non terminal Object ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
-non terminal Object ExpOcl, InvContext, ExpPrimaria, Literal;
-non terminal Object ExpLogica, OperadorLogico, OperadorRelacional, ExpRelacional;
-non terminal Object ExpAditiva, ExpMultiplicativa, ExpUnaria, OperadorMais,OperadorMulti;
-non terminal Object ExpAditivaAux, ExpMultiAux; 
-non terminal Object OperadorUnario, ExpPosFixada, ExpPosFixadaAux;
-non terminal Object ChamadaPropriedade, ExpressaoIf, Caminho;
-non terminal Object ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeOpt;
-non terminal Object ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
-non terminal Object EspecificadorTipoOpt, EspecificadorTipo, EspecificadorTipoSimples, CaminhoAux;
-non terminal Object OperadorColecao,Qualificadores,ChamadaPropriedadeColecao,QualificadoresOpt;
+non terminal No ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
+non terminal No ExpOcl, InvContext, ExpPrimaria, Literal;
+non terminal No ExpLogica, OperadorLogico, OperadorRelacional, ExpRelacional;
+non terminal No ExpAditiva, ExpMultiplicativa, ExpUnaria, OperadorMais,OperadorMulti;
+non terminal No ExpAditivaAux, ExpMultiAux; 
+non terminal No OperadorUnario, ExpPosFixada, ExpPosFixadaAux;
+non terminal No ChamadaPropriedade, ExpressaoIf, Caminho;
+non terminal No ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeOpt;
+non terminal No ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
+non terminal No EspecificadorTipoOpt, EspecificadorTipo, EspecificadorTipoSimples, CaminhoAux;
+non terminal No OperadorColecao,Qualificadores,ChamadaPropriedadeColecao,QualificadoresOpt;
 
 ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}| ;
 
@@ -157,7 +158,8 @@ Caminho ::= ID CaminhoAux ;
 
 CaminhoAux ::= DCOLON ID CaminhoAux | ;
 
-Literal ::= STRING | NUMERO ;
+Literal ::= STRING {:RESULT = new No("String");:}
+			| NUMERO ;
 
 
 OperadorColecao ::= INCLUDESALL | SIZE | INCLUDES | EXCLUDES | EXISTS | SELECT | FORALL ;

@@ -3,5 +3,5 @@
 #Script para compilar arquivos no diretorio correto com nomes padronizados
 
 jflex -d ../src/compil/inv/parser/ ocl.lex
-cup -parser OCLParser -symbols OCLSym -destdir ../src/compil/inv/parser/ ocl.cup 
+cup -parser OCL_Parser -symbols OCL_Sym -destdir ../src/compil/inv/parser/ ocl.cup 
 
