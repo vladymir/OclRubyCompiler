@@ -1,7 +1,7 @@
 package compil.inv.parser;
 
 import java_cup.runtime.*;
-import compil.inv.semantica.No;
+import compil.inv.semantica.Exp;
 
 parser code {:
     
@@ -53,17 +53,17 @@ terminal		CONTEXT, INV, OR, XOR, AND, NOT, LT, GT, LE, GE, EQUAL, NEQUAL,
 terminal String ID;
 terminal Number NUMERO;
 
-non terminal No ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
-non terminal No ExpOcl, InvContext, ExpPrimaria, Literal;
-non terminal No ExpLogica, OperadorLogico, OperadorRelacional, ExpRelacional;
-non terminal No ExpAditiva, ExpMultiplicativa, ExpUnaria, OperadorMais,OperadorMulti;
-non terminal No ExpAditivaAux, ExpMultiAux; 
-non terminal No OperadorUnario, ExpPosFixada, ExpPosFixadaAux;
-non terminal No ChamadaPropriedade, ExpressaoIf, Caminho;
-non terminal No ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeOpt;
-non terminal No ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
-non terminal No EspecificadorTipoOpt, EspecificadorTipo, EspecificadorTipoSimples, CaminhoAux;
-non terminal No OperadorColecao,Qualificadores,ChamadaPropriedadeColecao,QualificadoresOpt;
+non terminal Exp ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
+non terminal Exp ExpOcl, InvContext, ExpPrimaria, Literal;
+non terminal Exp ExpLogica, OperadorLogico, OperadorRelacional, ExpRelacional;
+non terminal Exp ExpAditiva, ExpMultiplicativa, ExpUnaria, OperadorMais,OperadorMulti;
+non terminal Exp ExpAditivaAux, ExpMultiAux; 
+non terminal Exp OperadorUnario, ExpPosFixada, ExpPosFixadaAux;
+non terminal Exp ChamadaPropriedade, ExpressaoIf, Caminho;
+non terminal Exp ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeOpt;
+non terminal Exp ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
+non terminal Exp EspecificadorTipoOpt, EspecificadorTipo, EspecificadorTipoSimples, CaminhoAux;
+non terminal Exp OperadorColecao,Qualificadores,ChamadaPropriedadeColecao,QualificadoresOpt;
 
 ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}
 				| ;
@@ -79,31 +79,34 @@ InvContext	::= INV COLON ExpOcl {:System.out.println(" invariante ");:} InvConte
 				INV ID COLON ExpOcl {:System.out.println(" invariante ");:} InvContext 
 				| ;
 
-ExpOcl ::= ExpLogica:e {: RESULT = e; :};
+ExpOcl ::= ExpLogica:e {: RESULT = Exp.checkType(e, "Boolean"); :};
 
-ExpLogica ::= ExpRelacional:e {: RESULT = e; :}
+ExpLogica ::= ExpRelacional:e {: RESULT = Exp.checkType(e, "Boolean"); :}
               |
-              ExpRelacional OperadorLogico ExpLogica {: RESULT = new No("Booleano"); System.out.println(" ExpressaoLogica ");:}
+              ExpRelacional:er OperadorLogico ExpLogica:el {: RESULT = Exp.checkSameType(er, el, "Boolean"); System.out.println(" ExpressaoLogica ");:}
               ;
 
 ExpRelacional ::= ExpAditiva:e {: RESULT = e; System.out.println(" ExpAditiva ");:}
 				  |
-				  ExpAditiva OperadorRelacional ExpAditiva {: RESULT = new No("Booleano"); System.out.println(" ExpAditiva < ExpAditiva ");:}
+				  ExpAditiva:e1 OperadorRelacional ExpAditiva:e2 {: RESULT = Exp.checkSameType(e1, e2, "Boolean"); System.out.println(" ExpAditiva < ExpAditiva ");:}
 				  ;
 
 
-ExpAditiva ::= ExpMultiplicativa ExpAditivaAux {: RESULT = new No("Numero"); :}; /*ID | NUMERO;*/
+ExpAditiva ::= ExpMultiplicativa:e1 ExpAditivaAux:e2 {: RESULT = Exp.checkSameType(e1, e2, e1.type);; :}; /*ID | NUMERO;*/
 
-ExpAditivaAux ::= ExpAditivaAux OperadorMais ExpMultiplicativa |  ;
+ExpAditivaAux ::= ExpAditivaAux:e1 OperadorMais ExpMultiplicativa:e2 {: Exp.checkType(e1, e2, "Number"); :}
+					|  ;
 
-ExpMultiplicativa ::= ExpUnaria ExpMultiAux ;
+ExpMultiplicativa ::= ExpUnaria:e1 ExpMultiAux:e2  {: RESULT = Exp.checkSameType(e1, e2, e1.type); :};
 
 
-ExpMultiAux ::= ExpMultiAux OperadorMulti ExpUnaria |  ;
+ExpMultiAux ::= ExpMultiAux:e1 OperadorMulti ExpUnaria:e2 {: Exp.checkType(e1, e2, "Number"); :}
+					|  ;
 
-ExpUnaria ::= OperadorUnario ExpPosFixada | ExpPosFixada {:System.out.println(" ExpressaoPostfix ");:};
+ExpUnaria ::= OperadorUnario:e1 ExpPosFixada:e2 {: RESULT = Exp.checkSameType(e1, e2, e1.type); :}
+				| ExpPosFixada:e {: RESULT = e; System.out.println(" ExpressaoPostfix ");:};
 
-ExpPosFixada ::= ExpPrimaria ExpPosFixadaAux {:System.out.println("Exp UNARIA");:};
+ExpPosFixada ::= ExpPrimaria:e1 ExpPosFixadaAux:e2 {: RESULT = Exp.checkSameType(e1, e2, e1.type); System.out.println("Exp UNARIA");:};
 
 ExpPosFixadaAux ::= ExpPosFixadaAux DOT ChamadaPropriedade {:System.out.println("postfix.propertycall");:}
 				    |
@@ -111,17 +114,15 @@ ExpPosFixadaAux ::= ExpPosFixadaAux DOT ChamadaPropriedade {:System.out.println(
 				    |
 				    ; 
 
-ExpPrimaria ::= Literal
-				| ChamadaPropriedade {:System.out.println("PropertyCall");:}
-				| LPAREN  ExpOcl RPAREN 
-				| ExpressaoIf ;
+ExpPrimaria ::= Literal:l {: RESULT = l; :}
+				| ChamadaPropriedade {: System.out.println("PropertyCall");:}
+				| LPAREN  ExpOcl:e RPAREN {: RESULT = e; :}
+				| ExpressaoIf:e {: RESULT = e; :};
 
-ExpressaoIf ::= IF ExpOcl THEN ExpOcl ELSE ExpOcl ENDIF ;
+ExpressaoIf ::= IF ExpOcl:e1 THEN ExpOcl:e2 ELSE ExpOcl:e3 ENDIF {: RESULT = Exp.ifExpType(e1, e2, e3); :};
 
 
-
-ChamadaPropriedadeColecao ::= OperadorColecao QualificadoresOpt ParametrosChamadaPropriedadeOpt 
-								;
+ChamadaPropriedadeColecao ::= OperadorColecao QualificadoresOpt ParametrosChamadaPropriedadeOpt ;
 							  
 
 ChamadaPropriedade ::= Caminho {:System.out.println("Path");:} QualificadoresOpt ParametrosChamadaPropriedadeOpt                                                                    
@@ -159,10 +160,10 @@ EspecificadorTipoSimples ::= Caminho ;
 
 Caminho ::= ID CaminhoAux ;
 
-CaminhoAux ::= DCOLON ID CaminhoAux | ;
+CaminhoAux ::= DCOLON ID CaminhoAux  | ;
 
-Literal ::= STRING {:RESULT = new No("String");:}
-			| NUMERO {:RESULT = new No("Numero");:} ;
+Literal ::= STRING {:RESULT = new Exp("String");:}
+			| NUMERO {:RESULT = new Exp("Numero");:} ;
 
 
 OperadorColecao ::= INCLUDESALL | SIZE | INCLUDES | EXCLUDES | EXISTS | SELECT | FORALL ;

@@ -122,4 +122,4 @@ COMENTARIO 		= "--" .* {LineTerminator}
 {LineTerminator} { }
 {COMENTARIO} { }
 
-. { throw new RuntimeException("Illegal char at line: " + yyline + " column: " + yycolumn); }
+. { throw new RuntimeException("Illegal char at line: " + (yyline+1) + " column: " + (yycolumn+1)); }
