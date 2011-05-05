@@ -56,11 +56,11 @@ non terminal Object ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierConte
 non terminal Object ExpOcl, InvContext, ExpPrimaria, Literal;
 non terminal Object ExpLogica, OperadorLogico, OperadorRelacional, ExpRelacional;
 non terminal Object ExpAditiva, ExpMultiplicativa, ExpUnaria, OperadorMais,OperadorMulti;
-non terminal Object ExpLogicaAux, ExpRelacionalAux, ExpAditivaAux, ExpMultiAux; 
-non terminal Object OperadorUnario, ExpPosFixada, ExpPosFixadaAux, DotOrArrow;
+non terminal Object ExpAditivaAux, ExpMultiAux; 
+non terminal Object OperadorUnario, ExpPosFixada, ExpPosFixadaAux;
 non terminal Object ChamadaPropriedade, ExpressaoIf, Caminho;
 non terminal Object ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeOpt;
-non terminal Object DeclaradorOpt, ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
+non terminal Object ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
 non terminal Object EspecificadorTipoOpt, EspecificadorTipo, EspecificadorTipoSimples, CaminhoAux;
 non terminal Object OperadorColecao,Qualificadores,ChamadaPropriedadeColecao,QualificadoresOpt;
 
@@ -135,8 +135,6 @@ ParametrosChamadaPropriedade ::= LPAREN  Declarador ExpOcl RPAREN
 								 |
 								 LPAREN RPAREN
 								 ;
-
-DeclaradorOpt ::= Declarador {:System.out.println("DeclaradorOpt");:} | ;
  
 ListaParametros ::= ExpOcl ListaParametrosOpt ;
 ListaParametrosOpt ::= COMMA ExpOcl ListaParametrosOpt | ; 
