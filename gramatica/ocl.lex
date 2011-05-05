@@ -51,6 +51,7 @@ MINUS			= \-
 MULT			= \*
 DIVIDE			= \/
 NEQUAL			= <>
+UNDER			= _
 
 DIGITO			= [0-9]
 INTEIRO			= {DIGITO}+
@@ -58,13 +59,15 @@ NUM_OPT			= ({DOT}{DIGITO}+)?((e|E)(PLUS|MINUS)?{DIGITO}+)?
 NUMERO			= {INTEIRO}{NUM_OPT}
 
 LETRA 			= [a-zA-Z]
-ID				= {LETRA}({LETRA}|{NUMERO})*{MULT}?
-STRING			= \"({LETRA}|{NUMERO})*\"
-WhiteSpace		= {LineTerminator} | [ \t\f]
+ID				= ({LETRA}|{UNDER})({LETRA}|{NUMERO}|{UNDER})*
+STRING			= \"(.)*\"
 
+WhiteSpace		= {LineTerminator} | [ \t\f]
+COMENTARIO 		= "--" .* {LineTerminator}
 
 %%
 /* ------------------------Lexical Rules Section---------------------- */
+
    
 "context" { return symbol(OCL_Sym.CONTEXT); }
 "inv" { return symbol(OCL_Sym.INV); }
@@ -117,3 +120,6 @@ WhiteSpace		= {LineTerminator} | [ \t\f]
 
 {WhiteSpace} { }
 {LineTerminator} { }
+{COMENTARIO} { }
+
+. { throw new RuntimeException("Illegal char at line: " + yyline + " column: " + yycolumn); }

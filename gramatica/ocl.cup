@@ -51,7 +51,7 @@ terminal		CONTEXT, INV, OR, XOR, AND, NOT, LT, GT, LE, GE, EQUAL, NEQUAL,
 				RCOL,LCOL,INCLUDESALL;
 
 terminal String ID;
-terminal Integer   NUMERO;
+terminal Number NUMERO;
 
 non terminal No ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
 non terminal No ExpOcl, InvContext, ExpPrimaria, Literal;
@@ -65,33 +65,34 @@ non terminal No ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
 non terminal No EspecificadorTipoOpt, EspecificadorTipo, EspecificadorTipoSimples, CaminhoAux;
 non terminal No OperadorColecao,Qualificadores,ChamadaPropriedadeColecao,QualificadoresOpt;
 
-ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}| ;
+ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}
+				| ;
 
 Restricao     ::= DeclaracaoContexto InvContext {:System.out.println(" Restricao ");:};
 
 DeclaracaoContexto ::= CONTEXT ClassifierContexto {:System.out.println(" DeclaracaoContexto ");:}; 
 
-ClassifierContexto ::= ID | ID COLON ID ;
+ClassifierContexto ::= ID | ID COLON ID | ID DCOLON ID ;
 
 InvContext	::= INV COLON ExpOcl {:System.out.println(" invariante ");:} InvContext 
 				| 
 				INV ID COLON ExpOcl {:System.out.println(" invariante ");:} InvContext 
 				| ;
 
-ExpOcl ::= ExpLogica ;
+ExpOcl ::= ExpLogica:e {: RESULT = e; :};
 
-ExpLogica ::= ExpRelacional 
+ExpLogica ::= ExpRelacional:e {: RESULT = e; :}
               |
-              ExpRelacional OperadorLogico ExpLogica {:System.out.println(" ExpressaoLogica ");:}
+              ExpRelacional OperadorLogico ExpLogica {: RESULT = new No("Booleano"); System.out.println(" ExpressaoLogica ");:}
               ;
 
-ExpRelacional ::= ExpAditiva {:System.out.println(" ExpAditiva ");:}
+ExpRelacional ::= ExpAditiva:e {: RESULT = e; System.out.println(" ExpAditiva ");:}
 				  |
-				  ExpAditiva OperadorRelacional ExpAditiva {:System.out.println(" ExpAditiva < ExpAditiva ");:}
+				  ExpAditiva OperadorRelacional ExpAditiva {: RESULT = new No("Booleano"); System.out.println(" ExpAditiva < ExpAditiva ");:}
 				  ;
 
 
-ExpAditiva ::= ExpMultiplicativa ExpAditivaAux ; /*ID | NUMERO;*/
+ExpAditiva ::= ExpMultiplicativa ExpAditivaAux {: RESULT = new No("Numero"); :}; /*ID | NUMERO;*/
 
 ExpAditivaAux ::= ExpAditivaAux OperadorMais ExpMultiplicativa |  ;
 
@@ -110,8 +111,10 @@ ExpPosFixadaAux ::= ExpPosFixadaAux DOT ChamadaPropriedade {:System.out.println(
 				    |
 				    ; 
 
-ExpPrimaria ::= Literal | ChamadaPropriedade {:System.out.println("PropertyCall");:}| LPAREN  ExpOcl RPAREN 
-					| ExpressaoIf ;
+ExpPrimaria ::= Literal
+				| ChamadaPropriedade {:System.out.println("PropertyCall");:}
+				| LPAREN  ExpOcl RPAREN 
+				| ExpressaoIf ;
 
 ExpressaoIf ::= IF ExpOcl THEN ExpOcl ELSE ExpOcl ENDIF ;
 
@@ -146,7 +149,7 @@ EspecificadorTipoOpt ::= SEMICOL ID COLON EspecificadorTipo EQUAL ExpOcl
                          |
                          COLON ID
                          |
-                          ;
+                         ;
 
 DeclaradorAux ::= COMMA ID DeclaradorAux | ;
 
@@ -159,7 +162,7 @@ Caminho ::= ID CaminhoAux ;
 CaminhoAux ::= DCOLON ID CaminhoAux | ;
 
 Literal ::= STRING {:RESULT = new No("String");:}
-			| NUMERO ;
+			| NUMERO {:RESULT = new No("Numero");:} ;
 
 
 OperadorColecao ::= INCLUDESALL | SIZE | INCLUDES | EXCLUDES | EXISTS | SELECT | FORALL ;

@@ -11,7 +11,7 @@ public class Main {
 			  OCL_Parser cup = new OCL_Parser(scanner);
 			  cup.parse();
 		  } catch(Exception e) {
-			  e.printStackTrace();
+			  System.err.println(e.getMessage());
 		  }
 	  }
 }
