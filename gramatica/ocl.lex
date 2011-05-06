@@ -76,6 +76,8 @@ COMENTARIO 		= "--" .* {LineTerminator}
 "xor" { return symbol(OCL_Sym.XOR); }
 "and" { return symbol(OCL_Sym.AND); }
 "not" { return symbol(OCL_Sym.NOT); }
+"true" { return symbol(OCL_Sym.TRUE); }
+"false" { return symbol(OCL_Sym.FALSE); }
 
 {LT} { return symbol(OCL_Sym.LT); }
 {GT} { return symbol(OCL_Sym.GT); }
