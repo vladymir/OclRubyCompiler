@@ -1,6 +1,7 @@
 package compil.xmi;
 
 import java.io.File;
+import java.util.Scanner;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,7 +18,9 @@ public class XMLReader {
     private static Vector<Classe> myClasses = new Vector<Classe>();
 
     public void startParser() {
-        parserXMI("arquivo/profe.xml");
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Informe o caminho do XML: ");                        
+        parserXMI(sc.nextLine());
         makeAssociations();
     }
 

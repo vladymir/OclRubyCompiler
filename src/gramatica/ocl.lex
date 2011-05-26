@@ -60,7 +60,7 @@ NUMERO			= {INTEIRO}{NUM_OPT}
 
 LETRA 			= [a-zA-Z]
 ID				= ({LETRA}|{UNDER})({LETRA}|{NUMERO}|{UNDER})*
-STRING			= \"(.)*\"
+STRING			= \'(.)*\'
 
 WhiteSpace		= {LineTerminator} | [ \t\f]
 COMENTARIO 		= "--" .* {LineTerminator}
@@ -111,7 +111,7 @@ COMENTARIO 		= "--" .* {LineTerminator}
 "size" { return symbol(OCL_Sym.SIZE); }
 "includes" { return symbol(OCL_Sym.INCLUDES); }
 "excludes" { return symbol(OCL_Sym.EXCLUDES); }
-"forAll" { System.out.println("FORALL");return symbol(OCL_Sym.FORALL); }
+"forAll" { return symbol(OCL_Sym.FORALL); }
 "select" { return symbol(OCL_Sym.SELECT); }
 "exists" { return symbol(OCL_Sym.EXISTS); }
 "includesAll" { return symbol(OCL_Sym.INCLUDESALL); }
