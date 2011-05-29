@@ -55,11 +55,11 @@ terminal CONTEXT, INV,
 terminal String ID, STRING, NUMERO, TRUE, FALSE;
 
 non terminal No ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
-non terminal Operacao ExpOcl, InvContext, ExpPrimaria;
+non terminal Expressao ExpOcl, InvContext, ExpPrimaria;
 non terminal Literal Literal;
-non terminal No ExpLogica, ExpRelacional;
-non terminal No ExpAditiva, ExpMultiplicativa, ExpUnaria;
-non terminal No ExpAditivaAux, ExpMultiAux, ExpPosFixada, ExpPosFixadaAux; 
+non terminal Expressao ExpLogica, ExpRelacional;
+non terminal Expressao ExpAditiva, ExpMultiplicativa, ExpUnaria;
+non terminal Expressao ExpAditivaAux, ExpMultiAux, ExpPosFixada, ExpPosFixadaAux; 
 non terminal Operador OperadorUnario, OperadorMais, OperadorMulti, OperadorRelacional, OperadorLogico;
 non terminal No ChamadaPropriedade, ExpressaoIf, Caminho;
 non terminal No ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeOpt;
@@ -81,42 +81,48 @@ InvContext	::= INV COLON ExpOcl InvContext
                     INV ID COLON ExpOcl InvContext 
                     | ;
 
-ExpOcl ::= ExpLogica;
+ExpOcl ::= ExpLogica:e {: parser.ger.concatenarSubExpressoesDe(e); RESULT = new Expressao(e); :};
 
-ExpLogica ::= ExpRelacional
-              |
-              ExpRelacional OperadorLogico:o {: parser.ger.oprd(o); :} ExpLogica 
-              ;
+ExpLogica ::= ExpRelacional:r {: parser.ger.concatenarSubExpressoesDe(r); RESULT = new Expressao(r); :}
+            | ExpRelacional:r1 {: parser.ger.concatenarSubExpressoesDe(r1); :} 
+            OperadorLogico:o {: parser.ger.oprd(o); :} 
+            ExpLogica:l1 {: parser.ger.concatenarSubExpressoesDe(l1); RESULT = new Expressao(o, r1, l1); :}
+            ;
 
-ExpRelacional ::= ExpAditiva
-                |
-                ExpAditiva OperadorRelacional:o {: parser.ger.oprd(o); :} ExpAditiva
+ExpRelacional ::= ExpAditiva:a {: parser.ger.concatenarSubExpressoesDe(a); RESULT = new Expressao(a); :} 
+                | ExpAditiva:a1 {: parser.ger.concatenarSubExpressoesDe(a1); :}  
+                OperadorRelacional:o {: parser.ger.oprd(o); :} 
+                ExpAditiva:a2 {: parser.ger.concatenarSubExpressoesDe(a1); RESULT = new Expressao(o, a1, a2); :}
                 ;
 
 
-ExpAditiva ::= ExpMultiplicativa ExpAditivaAux ;
+ExpAditiva ::= ExpMultiplicativa:emul {: parser.ger.concatenarSubExpressoesDe(emul); :} 
+                ExpAditivaAux:eaux {: parser.ger.concatenarSubExpressoesDe(eaux); RESULT = new Expressao(emul, eaux); :};
 
-ExpAditivaAux ::=  OperadorMais:o {: parser.ger.oprd(o); :} ExpMultiplicativa:e ExpAditivaAux {: parser.ger.operacao(o, op1, op2);:}
+ExpAditivaAux ::=  OperadorMais:o {: parser.ger.oprd(o); :} ExpMultiplicativa:op1 {: parser.ger.concatenarSubExpressoesDe(op1); :}
+                ExpAditivaAux:op2 {: parser.ger.concatenarSubExpressoesDe(op2); RESULT = new Expressao(o, op1, op2);:}
 		|  ;
 
-ExpMultiplicativa ::= ExpUnaria ExpMultiAux  ;
+ExpMultiplicativa ::= ExpUnaria:eun {: parser.ger.concatenarSubExpressoesDe(eun); :} ExpMultiAux:eaux {: parser.ger.concatenarSubExpressoesDe(eaux); RESULT = new Expressao(eun, eaux); :};
 
 
-ExpMultiAux ::= OperadorMulti:o {: parser.ger.oprd(o); :} ExpUnaria ExpMultiAux
+ExpMultiAux ::= OperadorMulti:o {: parser.ger.oprd(o); :} ExpUnaria:e1 {: parser.ger.concatenarSubExpressoesDe(e1); :} 
+                ExpMultiAux:e2 {: parser.ger.concatenarSubExpressoesDe(e2); RESULT = new Expressao(o, e1, e2); :}
 		|  ;
 
-ExpUnaria ::= OperadorUnario:o {: parser.ger.oprd(o); :} ExpPosFixada
-                | ExpPosFixada ;
+ExpUnaria ::= OperadorUnario:o {: parser.ger.oprd(o); :} ExpPosFixada:epf {: parser.ger.concatenarSubExpressoesDe(epf); RESULT = new Expressao(o, epf); :}
+                | ExpPosFixada:epf {: parser.ger.concatenarSubExpressoesDe(epf); RESULT = new Expressao(epf); :};
 
-ExpPosFixada ::= ExpPrimaria ExpPosFixadaAux {:  :};
+ExpPosFixada ::= ExpPrimaria:ep ExpPosFixadaAux:epf {: RESULT = new Expressao(ep, epf); :};
 
+/* TODO: gerar codigo para expPosFixadaAux e nao-terminais filhos */
 ExpPosFixadaAux ::= DOT ChamadaPropriedade ExpPosFixadaAux
                     |
                     RARROW ChamadaPropriedadeColecao ExpPosFixadaAux
                     |
                     ; 
 
-ExpPrimaria ::= Literal:l {: RESULT = Operacao(l); :}
+ExpPrimaria ::= Literal:l {: RESULT = new Expressao(l); :}
 		| ChamadaPropriedade
 		| LPAREN  ExpOcl RPAREN
 		| ExpressaoIf;

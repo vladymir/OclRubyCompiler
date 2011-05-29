@@ -23,12 +23,15 @@ public class GeradorDeCodigo {
         return GeradorDeCodigoHolder.INSTANCE;
     }
     
-   
-    public void operacaoUnaria(Operador o, Literal l){
-        
-    }
-
-    public void operacao(Operador o, Operacao op1, Operacao op2){
+    public void concatenarSubExpressoesDe(Expressao e){
+        if (e.exp2 == null && e.oprd == null )
+            e.codigo = e.exp1.codigo;
+        else if (e.exp2 == null)
+            e.codigo = e.exp1.codigo + e.oprd.codigo;
+        else if(e.oprd == null)
+            e.codigo = e.exp1.codigo + e.exp2.codigo;
+        else
+            e.codigo = e.oprd.codigo + e.exp1.codigo + e.exp2.codigo;
         
     }
     
