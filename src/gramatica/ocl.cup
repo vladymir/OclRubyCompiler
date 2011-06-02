@@ -65,58 +65,52 @@ non terminal Expressao ExpAditiva, ExpMultiplicativa, ExpUnaria;
 non terminal Expressao ExpAditivaAux, ExpMultiAux, ExpPosFixada, ExpPosFixadaAux; 
 non terminal Operador OperadorUnario, OperadorMais, OperadorMulti, OperadorRelacional, OperadorLogico;
 non terminal No ChamadaPropriedade, ExpressaoIf, Caminho;
+non terminal Caminho Caminho;
 non terminal No ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeOpt;
 non terminal No ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
 non terminal No EspecificadorTipoOpt, EspecificadorTipo, EspecificadorTipoSimples, CaminhoAux;
 non terminal No OperadorColecao,Qualificadores,ChamadaPropriedadeColecao,QualificadoresOpt;
 
-ExpressoesOcl ::= Restricao:r {: parser.ger.restricao(r); :} ExpressoesOcl {:System.out.println("casei");:}
+ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}
                 | ;
 
-Restricao ::= DeclaracaoContexto:c InvContext:i {: parser.ger.invariante(i); RESULT = new Restricao(c); :};
+Restricao ::= DeclaracaoContexto:c InvContext:i {: RESULT = new Restricao(c); :};
 
-DeclaracaoContexto ::= CONTEXT ClassifierContexto:c {: parser.ger.classe(c); RESULT = c;:} ; 
+DeclaracaoContexto ::= CONTEXT ClassifierContexto:c {: RESULT = c;:} ; 
 
 ClassifierContexto ::= ID:id {: RESULT = new Classe(id); :} 
                 | ID:id1 COLON ID:id2 {: RESULT = new Classe(id1, id2); :} 
                 | ID:id1 DCOLON ID:id2 {: RESULT = new Classe(id1, id2); :} ;
 
-InvContext ::= INV COLON ExpOcl:e {: RESULT = new Invariante(e); :} InvContext:i {: parser.ger.invariante(i); :}  
+InvContext ::= INV COLON ExpOcl:e {: RESULT = new Invariante(e); :} InvContext 
                 | 
-                INV ID:id COLON ExpOcl:e {: RESULT = new Invariante(e, id); :} InvContext:i {: parser.ger.invariante(i); :} 
+                INV ID:id COLON ExpOcl:e {: RESULT = new Invariante(e, id); :} InvContext
                 | ;
 
-ExpOcl ::= ExpLogica:e {: parser.ger.concatenarSubExpressoesDe(e); RESULT = new Expressao(e); :};
+ExpOcl ::= ExpLogica:e {: RESULT = new Expressao(e); :};
 
-ExpLogica ::= ExpRelacional:r {: parser.ger.concatenarSubExpressoesDe(r); RESULT = new Expressao(r); :}
-            | ExpRelacional:r1 {: parser.ger.concatenarSubExpressoesDe(r1); :} 
-            OperadorLogico:o {: parser.ger.oprd(o); :} 
-            ExpLogica:l1 {: parser.ger.concatenarSubExpressoesDe(l1); RESULT = new Expressao(o, r1, l1); :}
+ExpLogica ::= ExpRelacional:r {: RESULT = new Expressao(r); :}
+            | ExpRelacional:r1 OperadorLogico:o ExpLogica:l1 {: RESULT = new Expressao(o, r1, l1); :}
             ;
 
-ExpRelacional ::= ExpAditiva:a {: parser.ger.concatenarSubExpressoesDe(a); RESULT = new Expressao(a); :} 
-                | ExpAditiva:a1 {: parser.ger.concatenarSubExpressoesDe(a1); :}  
-                OperadorRelacional:o {: parser.ger.oprd(o); :} 
-                ExpAditiva:a2 {: parser.ger.concatenarSubExpressoesDe(a1); RESULT = new Expressao(o, a1, a2); :}
+ExpRelacional ::= ExpAditiva:a { RESULT = new Expressao(a); :} 
+                | ExpAditiva:a1 OperadorRelacional:o ExpAditiva:a2 {: RESULT = new Expressao(o, a1, a2); :}
                 ;
 
 
-ExpAditiva ::= ExpMultiplicativa:emul {: parser.ger.concatenarSubExpressoesDe(emul); :} 
-                ExpAditivaAux:eaux {: parser.ger.concatenarSubExpressoesDe(eaux); RESULT = new Expressao(emul, eaux); :};
+ExpAditiva ::= ExpMultiplicativa:emul ExpAditivaAux:eaux {: RESULT = new Expressao(emul, eaux); :};
 
-ExpAditivaAux ::=  OperadorMais:o {: parser.ger.oprd(o); :} ExpMultiplicativa:op1 {: parser.ger.concatenarSubExpressoesDe(op1); :}
-                ExpAditivaAux:op2 {: parser.ger.concatenarSubExpressoesDe(op2); RESULT = new Expressao(o, op1, op2);:}
+ExpAditivaAux ::=  OperadorMais:o ExpMultiplicativa:op1 ExpAditivaAux:op2 {: RESULT = new Expressao(o, op1, op2);:}
 		|  ;
 
-ExpMultiplicativa ::= ExpUnaria:eun {: parser.ger.concatenarSubExpressoesDe(eun); :} ExpMultiAux:eaux {: parser.ger.concatenarSubExpressoesDe(eaux); RESULT = new Expressao(eun, eaux); :};
+ExpMultiplicativa ::= ExpUnaria:eun ExpMultiAux:eaux {: RESULT = new Expressao(eun, eaux); :};
 
 
-ExpMultiAux ::= OperadorMulti:o {: parser.ger.oprd(o); :} ExpUnaria:e1 {: parser.ger.concatenarSubExpressoesDe(e1); :} 
-                ExpMultiAux:e2 {: parser.ger.concatenarSubExpressoesDe(e2); RESULT = new Expressao(o, e1, e2); :}
+ExpMultiAux ::= OperadorMulti:o ExpUnaria:e1 ExpMultiAux:e2 {: RESULT = new Expressao(o, e1, e2); :}
 		|  ;
 
-ExpUnaria ::= OperadorUnario:o {: parser.ger.oprd(o); :} ExpPosFixada:epf {: parser.ger.concatenarSubExpressoesDe(epf); RESULT = new Expressao(o, epf); :}
-                | ExpPosFixada:epf {: parser.ger.concatenarSubExpressoesDe(epf); RESULT = new Expressao(epf); :};
+ExpUnaria ::= OperadorUnario:o ExpPosFixada:epf {: RESULT = new Expressao(o, epf); :}
+                | ExpPosFixada:epf {: RESULT = new Expressao(epf); :};
 
 ExpPosFixada ::= ExpPrimaria:ep ExpPosFixadaAux:epf {: RESULT = new Expressao(ep, epf); :};
 
@@ -129,17 +123,16 @@ ExpPosFixadaAux ::= DOT ChamadaPropriedade ExpPosFixadaAux
 
 ExpPrimaria ::= Literal:l {: RESULT = new Expressao(l); :}
 		| ChamadaPropriedade
-		| LPAREN  ExpOcl RPAREN
-		| ExpressaoIf;
+		| LPAREN  ExpOcl:e RPAREN {: RESULT = new Expressao(e); :}
+		| ExpressaoIf:eif {: RESULT = new Expressao(eif); :} ;
 
-ExpressaoIf ::= IF ExpOcl THEN ExpOcl ELSE ExpOcl ENDIF;
+ExpressaoIf ::= IF ExpOcl:e1 THEN ExpOcl:e2 ELSE ExpOcl:e3 ENDIF {: RESULT = new ExpressaoIf(e1,e2,e3); :};
 
 
 ChamadaPropriedadeColecao ::= OperadorColecao ParametrosChamadaPropriedadeOpt ;
 							  
 
-ChamadaPropriedade ::= Caminho ParametrosChamadaPropriedadeOpt                                                                    
-                       ;
+ChamadaPropriedade ::= Caminho ParametrosChamadaPropriedadeOpt ;
 
 ParametrosChamadaPropriedadeOpt ::= ParametrosChamadaPropriedade | ; 
 
@@ -152,7 +145,7 @@ ListaParametrosOpt ::= COMMA ExpOcl ListaParametrosOpt | ;
 
 Declarador ::= ID DeclaradorAux EspecificadorTipoOpt BAR  ;
 
-EspecificadorTipoOpt ::= SEMICOL ID COLON EspecificadorTipo EQUAL ExpOcl 
+EspecificadorTipoOpt ::= SEMICOL ID COLON Caminho EQUAL ExpOcl 
                          |
                          COLON ID
                          |
@@ -160,13 +153,9 @@ EspecificadorTipoOpt ::= SEMICOL ID COLON EspecificadorTipo EQUAL ExpOcl
 
 DeclaradorAux ::= COMMA ID DeclaradorAux | ;
 
-EspecificadorTipo ::= EspecificadorTipoSimples ;
+Caminho ::= ID:id CaminhoAux:c {: RESULT = new Caminho(id, c); :} ;
 
-EspecificadorTipoSimples ::= Caminho ;
-
-Caminho ::= ID CaminhoAux ;
-
-CaminhoAux ::= DCOLON ID CaminhoAux  | ;
+CaminhoAux ::= DCOLON ID:id CaminhoAux:c {: RESULT = new Caminho(id, c); :} | ;
 
 Literal ::= STRING:s {: RESULT = new Literal(s, Literal.STRING); :} 
             | NUMERO:n {: RESULT = new Literal(n, Literal.NUMERO); :} 

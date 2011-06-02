@@ -3,6 +3,8 @@
  */
 package compil.inv.semantica;
 
+import compil.inv.geracao.GeradorDeCodigo;
+
 /**
  *
  * @author nicholas
@@ -30,6 +32,11 @@ public class Operador extends No {
     
     public Operador(int tipo) {
         this.tipo = tipo;
+        gerarCodigo();
+    }
+
+    protected void gerarCodigo() {
+        GeradorDeCodigo.getInstance().oprd(this);
     }
     
     

@@ -1,6 +1,8 @@
 package compil.inv.semantica;
 
-public class No {
+public abstract class No {
         public String codigo = "";
+        
+        protected abstract void gerarCodigo();
 	
 }

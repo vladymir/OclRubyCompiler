@@ -103,6 +103,12 @@ public class GeradorDeCodigo {
         c.codigo = "class " + c.nome + "\n";
     }
     
+    public void expressaoIf(ExpressaoIf eIf) {
+        eIf.codigo = "\tif " + eIf.exp1 + "\n";
+        eIf.codigo += "\t\t" + eIf.exp2 + "\n";
+        eIf.codigo += "\telse\n" + eIf.exp3 + "\n"; 
+    }
+    
     public void restricao(Restricao r) {
         r.codigo = r.classe.codigo;
         for (Iterator<Invariante> it = listaInvariantes.iterator(); it.hasNext();) {

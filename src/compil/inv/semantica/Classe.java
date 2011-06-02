@@ -3,6 +3,8 @@
  */
 package compil.inv.semantica;
 
+import compil.inv.geracao.GeradorDeCodigo;
+
 /**
  *
  * @author nicholas
@@ -19,6 +21,10 @@ public class Classe extends No {
 
     public Classe(String nome) {
         this.nome = nome;
+    }
+
+    protected void gerarCodigo() {
+        GeradorDeCodigo.getInstance().classe(this);
     }
     
     
