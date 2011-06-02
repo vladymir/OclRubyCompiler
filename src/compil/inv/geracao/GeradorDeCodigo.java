@@ -6,6 +6,8 @@
 package compil.inv.geracao;
 
 import compil.inv.semantica.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * @version 0.1
@@ -13,6 +15,8 @@ import compil.inv.semantica.*;
  */
 
 public class GeradorDeCodigo {
+    
+    private ArrayList<Invariante> listaInvariantes = new ArrayList<Invariante>();
     
     
     
@@ -84,6 +88,33 @@ public class GeradorDeCodigo {
             case Operador.IMPLIES:
                 break;
         }
+    }
+    
+    public void invariante(Invariante e){
+        if (e.nome.equals("")) {
+            String nomeAuto = "inv" + (this.listaInvariantes.size() +1);
+            e.nome = nomeAuto;
+        }
+        e.codigo = "\tdef " + e.nome + "()\n" + checarInvariante(e);
+        this.listaInvariantes.add(e);
+    }
+    
+    public void classe(Classe c) {
+        c.codigo = "class " + c.nome + "\n";
+    }
+    
+    public void restricao(Restricao r) {
+        r.codigo = r.classe.codigo;
+        for (Iterator<Invariante> it = listaInvariantes.iterator(); it.hasNext();) {
+            Invariante invariante = it.next();
+            r.codigo += invariante.codigo;
+        }
+        System.out.println(r.codigo);
+        
+    }
+
+    private String checarInvariante(Invariante e) {
+        return "\t\treturn " + e.expressao.codigo;
     }
     
     private static class GeradorDeCodigoHolder {

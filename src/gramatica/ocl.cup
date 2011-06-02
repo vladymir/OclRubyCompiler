@@ -54,8 +54,11 @@ terminal CONTEXT, INV,
 
 terminal String ID, STRING, NUMERO, TRUE, FALSE;
 
-non terminal No ExpressoesOcl, Restricao, DeclaracaoContexto,ClassifierContexto;
-non terminal Expressao ExpOcl, InvContext, ExpPrimaria;
+non terminal No ExpressoesOcl;
+non terminal Restricao Restricao;
+non terminal Classe DeclaracaoContexto, ClassifierContexto;
+non terminal Expressao ExpOcl, ExpPrimaria;
+non terminal Invariante InvContext;
 non terminal Literal Literal;
 non terminal Expressao ExpLogica, ExpRelacional;
 non terminal Expressao ExpAditiva, ExpMultiplicativa, ExpUnaria;
@@ -67,19 +70,21 @@ non terminal No ListaParametrosOpt, Declarador, ListaParametros, DeclaradorAux;
 non terminal No EspecificadorTipoOpt, EspecificadorTipo, EspecificadorTipoSimples, CaminhoAux;
 non terminal No OperadorColecao,Qualificadores,ChamadaPropriedadeColecao,QualificadoresOpt;
 
-ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}
-				| ;
+ExpressoesOcl ::= Restricao:r {: parser.ger.restricao(r); :} ExpressoesOcl {:System.out.println("casei");:}
+                | ;
 
-Restricao     ::= DeclaracaoContexto InvContext;
+Restricao ::= DeclaracaoContexto:c InvContext:i {: parser.ger.invariante(i); RESULT = new Restricao(c); :};
 
-DeclaracaoContexto ::= CONTEXT ClassifierContexto; 
+DeclaracaoContexto ::= CONTEXT ClassifierContexto:c {: parser.ger.classe(c); RESULT = c;:} ; 
 
-ClassifierContexto ::= ID | ID COLON ID | ID DCOLON ID ;
+ClassifierContexto ::= ID:id {: RESULT = new Classe(id); :} 
+                | ID:id1 COLON ID:id2 {: RESULT = new Classe(id1, id2); :} 
+                | ID:id1 DCOLON ID:id2 {: RESULT = new Classe(id1, id2); :} ;
 
-InvContext	::= INV COLON ExpOcl InvContext 
-                    | 
-                    INV ID COLON ExpOcl InvContext 
-                    | ;
+InvContext ::= INV COLON ExpOcl:e {: RESULT = new Invariante(e); :} InvContext:i {: parser.ger.invariante(i); :}  
+                | 
+                INV ID:id COLON ExpOcl:e {: RESULT = new Invariante(e, id); :} InvContext:i {: parser.ger.invariante(i); :} 
+                | ;
 
 ExpOcl ::= ExpLogica:e {: parser.ger.concatenarSubExpressoesDe(e); RESULT = new Expressao(e); :};
 
