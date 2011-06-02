@@ -31,8 +31,6 @@ import static compil.inv.parser.OCL_Sym.*;
 LineTerminator		= \r|\n|\r\n
 LPAREN			= \(
 RPAREN			= \)
-RCOL			= \]
-LCOL			= \[
 SEMICOL			= ;
 COLON			= :
 DCOLON			= ::
@@ -100,8 +98,6 @@ COMENTARIO 		= "--" .* {LineTerminator}
 {BAR} { return symbol(OCL_Sym.BAR); }
 {RARROW} { return symbol(OCL_Sym.RARROW); }
 {DOT} { return symbol(OCL_Sym.DOT); }
-{RCOL} { return symbol(OCL_Sym.RCOL); }
-{LCOL} { return symbol(OCL_Sym.LCOL); }
 "if" { return symbol(OCL_Sym.IF); }
 "then" { return symbol(OCL_Sym.THEN); }
 "else" { return symbol(OCL_Sym.ELSE); }
