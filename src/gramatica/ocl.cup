@@ -70,8 +70,8 @@ non terminal Declarador Declarador, DeclaradorAux;
 non terminal OprdCol OperadorColecao;
 non terminal OperacaoCol ChamadaPropriedadeColecao;
 
-ExpressoesOcl ::= Restricao:r {: System.out.print(r.codigo); :} ExpressoesOcl {:System.out.println("casei");:}
-                | ;
+ExpressoesOcl ::= Restricao:r {: parser.ger.gerarArquivoRuby(r); :} ExpressoesOcl 
+                |  ;
 
 Restricao ::= DeclaracaoContexto:c InvContext:i {: RESULT = new Restricao(c); :};
 
@@ -157,8 +157,8 @@ CaminhoAux ::= DCOLON ID:id CaminhoAux:c {: RESULT = new Caminho(id, c); :} | ;
 
 Literal ::= STRING:s {: RESULT = new Literal(s, Literal.STRING); :} 
             | NUMERO:n {: RESULT = new Literal(n, Literal.NUMERO); :} 
-            | TRUE:t {: RESULT = new Literal(t, Literal.BOOLEANO); :}
-            | FALSE:f {: RESULT = new Literal(f, Literal.BOOLEANO); :} ;
+            | TRUE {: RESULT = new Literal("true", Literal.BOOLEANO); :}
+            | FALSE {: RESULT = new Literal("false", Literal.BOOLEANO); :} ;
 
 
 OperadorColecao ::= INCLUDESALL {: RESULT = new OprdCol(OprdCol.INCLUDESALL); :}

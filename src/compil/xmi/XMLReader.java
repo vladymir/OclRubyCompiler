@@ -2,7 +2,7 @@ package compil.xmi;
 
 import java.io.File;
 import java.util.Scanner;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,9 +13,9 @@ import org.w3c.dom.NodeList;
 
 public class XMLReader {
 
-    private static Vector<Association> myAssociationVector = new Vector<Association>();
+    private static ArrayList<Association> myAssociationVector = new ArrayList<Association>();
     private static EnumClass myEnum;
-    private static Vector<Classe> myClasses = new Vector<Classe>();
+    private static ArrayList<Classe> myClasses = new ArrayList<Classe>();
 
     public void startParser() {
         Scanner sc = new Scanner(System.in);
@@ -28,11 +28,11 @@ public class XMLReader {
         makeAssociations();
     }
 
-    public static Vector<Association> getMyAssociationVector() {
+    public static ArrayList<Association> getMyAssociationVector() {
         return myAssociationVector;
     }
 
-    public static Vector<Classe> getMyClasses() {
+    public static ArrayList<Classe> getMyClasses() {
         return myClasses;
     }
 
@@ -173,8 +173,8 @@ public class XMLReader {
 
                                             myClasses.get(position).addOperation(
                                                     new Operacao(
-                                                    operId,
                                                     operName,
+                                                    operId,
                                                     operType,
                                                     idOperAtt,
                                                     idOperName,
