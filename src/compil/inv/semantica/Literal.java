@@ -30,7 +30,7 @@ public class Literal extends No {
                 this.tipo = INTEIRO;
         else
             this.tipo = tipo;
-        gerarCodigo();
+        this.gerarCodigo();
     }
 
     protected void gerarCodigo() {

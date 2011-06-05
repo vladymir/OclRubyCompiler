@@ -17,10 +17,12 @@ public class Classe extends No {
     public Classe(String nome, String pacote) {
         this.nome = nome;
         this.pacote = pacote;
+        this.gerarCodigo();
     }
 
     public Classe(String nome) {
         this.nome = nome;
+        this.gerarCodigo();
     }
 
     protected void gerarCodigo() {

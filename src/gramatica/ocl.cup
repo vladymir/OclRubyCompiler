@@ -53,25 +53,24 @@ terminal CONTEXT, INV,
 
 terminal String ID, STRING, NUMERO, TRUE, FALSE;
 
-non terminal No ExpressoesOcl;
+non terminal No ExpressoesOcl, EspecificadorTipoOpt;
 non terminal Restricao Restricao;
 non terminal Classe DeclaracaoContexto, ClassifierContexto;
 non terminal Expressao ExpOcl, ExpPrimaria;
 non terminal Invariante InvContext;
 non terminal Literal Literal;
-non terminal Expressao ExpLogica, ExpRelacional;
-non terminal Expressao ExpAditiva, ExpMultiplicativa, ExpUnaria;
-non terminal Expressao ExpAditivaAux, ExpMultiAux, ExpPosFixada, ExpPosFixadaAux; 
+non terminal Expressao ExpLogica, ExpRelacional, ExpAditiva, ExpMultiplicativa, ExpUnaria, ExpPosFixada;
+non terminal Expressao ExpAditivaAux, ExpMultiAux, ExpPosFixadaAux, ExpLogicaAux, ExpRelacionalAux; 
 non terminal ExpressaoIf ExpressaoIf; 
 non terminal Operador OperadorUnario, OperadorMais, OperadorMulti, OperadorRelacional, OperadorLogico;
-non terminal No ChamadaPropriedade;
+non terminal Propriedade ChamadaPropriedade;
 non terminal Caminho Caminho, CaminhoAux;
-non terminal No ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeOpt;
-non terminal No Declarador, DeclaradorAux;
-non terminal No EspecificadorTipoOpt ;
-non terminal No OperadorColecao,ChamadaPropriedadeColecao;
+non terminal Parametros ParametrosChamadaPropriedade, ParametrosChamadaPropriedadeAux, ParametrosChamadaPropriedadeOpt;
+non terminal Declarador Declarador, DeclaradorAux;
+non terminal OprdCol OperadorColecao;
+non terminal OperacaoCol ChamadaPropriedadeColecao;
 
-ExpressoesOcl ::= Restricao ExpressoesOcl {:System.out.println("casei");:}
+ExpressoesOcl ::= Restricao:r {: System.out.print(r.codigo); :} ExpressoesOcl {:System.out.println("casei");:}
                 | ;
 
 Restricao ::= DeclaracaoContexto:c InvContext:i {: RESULT = new Restricao(c); :};
@@ -89,14 +88,15 @@ InvContext ::= INV COLON ExpOcl:e {: RESULT = new Invariante(e); :} InvContext
 
 ExpOcl ::= ExpLogica:e {: RESULT = new Expressao(e); :};
 
-ExpLogica ::= ExpRelacional:r {: RESULT = new Expressao(r); :}
-            | ExpRelacional:r1 OperadorLogico:o ExpLogica:l1 {: RESULT = new Expressao(o, r1, l1); :}
-            ;
+ExpLogica ::= ExpRelacional:r ExpLogicaAux:e {: RESULT = new Expressao(r, e); :} ;
 
-ExpRelacional ::= ExpAditiva:a {: RESULT = new Expressao(a); :} 
-                | ExpAditiva:a1 OperadorRelacional:o ExpAditiva:a2 {: RESULT = new Expressao(o, a1, a2); :}
-                ;
+ExpLogicaAux ::= OperadorLogico:o ExpLogica:l {: RESULT = new Expressao(o, l); :}
+              | ;
 
+ExpRelacional ::= ExpAditiva:a ExpRelacionalAux:e {: RESULT = new Expressao(a, e); :} ;
+
+ExpRelacionalAux ::= OperadorRelacional:o ExpAditiva:a {: RESULT = new Expressao(o, a); :}
+                    | ;
 
 ExpAditiva ::= ExpMultiplicativa:emul ExpAditivaAux:eaux {: RESULT = new Expressao(emul, eaux); :};
 
@@ -114,41 +114,42 @@ ExpUnaria ::= OperadorUnario:o ExpPosFixada:epf {: RESULT = new Expressao(o, epf
 
 ExpPosFixada ::= ExpPrimaria:ep ExpPosFixadaAux:epf {: RESULT = new Expressao(ep, epf); :};
 
-/* TODO: gerar codigo para expPosFixadaAux e nao-terminais filhos */
-ExpPosFixadaAux ::= DOT ChamadaPropriedade ExpPosFixadaAux
+
+ExpPosFixadaAux ::= DOT ChamadaPropriedade:c ExpPosFixadaAux:epf {: RESULT = new Expressao(c, epf); :}
                     |
-                    RARROW ChamadaPropriedadeColecao ExpPosFixadaAux
+                    RARROW ChamadaPropriedadeColecao:c ExpPosFixadaAux:epf {: RESULT = new Expressao(c, epf); :}
                     |
                     ; 
 
 ExpPrimaria ::= Literal:l {: RESULT = new Expressao(l); :}
-		| ChamadaPropriedade
+		| ChamadaPropriedade:c {: RESULT = new Expressao(c); :}
 		| LPAREN  ExpOcl:e RPAREN {: RESULT = new Expressao(e); :}
 		| ExpressaoIf:eif {: RESULT = new Expressao(eif); :} ;
 
 ExpressaoIf ::= IF ExpOcl:e1 THEN ExpOcl:e2 ELSE ExpOcl:e3 ENDIF {: RESULT = new ExpressaoIf(e1,e2,e3); :};
 
 
-ChamadaPropriedadeColecao ::= OperadorColecao ParametrosChamadaPropriedadeOpt ;
+ChamadaPropriedade ::= Caminho:c ParametrosChamadaPropriedadeOpt:p {: RESULT = new Propriedade(c, p); :};
+
+ChamadaPropriedadeColecao ::= OperadorColecao:o ParametrosChamadaPropriedadeOpt:p {: RESULT = new OperacaoCol(o, p); :};
 							  
+ParametrosChamadaPropriedadeOpt ::= ParametrosChamadaPropriedade:p {: RESULT = p; :} | ; 
 
-ChamadaPropriedade ::= Caminho ParametrosChamadaPropriedadeOpt ;
+ParametrosChamadaPropriedade ::= LPAREN ParametrosChamadaPropriedadeAux:p {: RESULT = p; :} ;
 
-ParametrosChamadaPropriedadeOpt ::= ParametrosChamadaPropriedade | ; 
+ParametrosChamadaPropriedadeAux ::= ExpOcl:e {: RESULT = new Parametros(e); :} RPAREN 
+                                | Declarador:d ExpOcl:e {: RESULT = new Parametros(d, e); :} RPAREN 
+                                | RPAREN {: RESULT = new Parametros(); :};
 
-ParametrosChamadaPropriedade ::= LPAREN  Declarador ExpOcl RPAREN 	 
-                                | LPAREN ExpOcl RPAREN
-                                | LPAREN RPAREN ;
+Declarador ::= ID:id DeclaradorAux:aux {: RESULT = new Declarador(id, aux); :} EspecificadorTipoOpt BAR  ;
 
-Declarador ::= ID DeclaradorAux EspecificadorTipoOpt BAR  ;
+DeclaradorAux ::= COMMA ID:id DeclaradorAux:aux {: RESULT = new Declarador(id, aux); :} | ;
 
 EspecificadorTipoOpt ::= SEMICOL ID COLON Caminho EQUAL ExpOcl 
                          |
                          COLON ID
                          |
                          ;
-
-DeclaradorAux ::= COMMA ID DeclaradorAux | ;
 
 Caminho ::= ID:id CaminhoAux:c {: RESULT = new Caminho(id, c); :} ;
 
@@ -160,7 +161,13 @@ Literal ::= STRING:s {: RESULT = new Literal(s, Literal.STRING); :}
             | FALSE:f {: RESULT = new Literal(f, Literal.BOOLEANO); :} ;
 
 
-OperadorColecao ::= INCLUDESALL | SIZE | INCLUDES | EXCLUDES | EXISTS | SELECT | FORALL ;
+OperadorColecao ::= INCLUDESALL {: RESULT = new OprdCol(OprdCol.INCLUDESALL); :}
+                | SIZE {: RESULT = new OprdCol(OprdCol.SIZE); :}
+                | INCLUDES {: RESULT = new OprdCol(OprdCol.INCLUDES); :}
+                | EXCLUDES {: RESULT = new OprdCol(OprdCol.EXCLUDES); :}
+                | EXISTS {: RESULT = new OprdCol(OprdCol.EXISTS); :}
+                | SELECT {: RESULT = new OprdCol(OprdCol.SELECT); :}
+                | FORALL {: RESULT = new OprdCol(OprdCol.FORALL); :} ;
 OperadorMais ::= PLUS {: RESULT = new Operador(Operador.MAIS);:} 
                 | MINUS {:RESULT = new Operador(Operador.MENOS);:};
 OperadorMulti ::= MULT {:RESULT = new Operador(Operador.VEZES);:}

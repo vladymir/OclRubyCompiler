@@ -19,8 +19,12 @@ public class XMLReader {
 
     public void startParser() {
         Scanner sc = new Scanner(System.in);
-        System.out.print("Informe o caminho do XML: ");                        
-        parserXMI(sc.nextLine());
+        System.out.print("Informe o caminho do XML: ");
+        String path = sc.nextLine();
+        if(path.equals(""))
+            parserXMI("build/classes/compil/xmi/arquivo/profe.xml");
+        else
+            parserXMI(path);
         makeAssociations();
     }
 

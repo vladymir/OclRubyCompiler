@@ -18,8 +18,6 @@ public class GeradorDeCodigo {
     
     private ArrayList<Invariante> listaInvariantes = new ArrayList<Invariante>();
     
-    
-    
     private GeradorDeCodigo() {
     }
     
@@ -29,13 +27,19 @@ public class GeradorDeCodigo {
     
     public void concatenarSubExpressoesDe(Expressao e){
         if (e.exp2 == null && e.oprd == null )
-            e.codigo = e.exp1.codigo;
-        else if (e.exp2 == null)
-            e.codigo = e.exp1.codigo + e.oprd.codigo;
-        else if(e.oprd == null)
-            e.codigo = e.exp1.codigo + e.exp2.codigo;
+            e.codigo += e.exp1.codigo;
+        else if (e.exp2 == null) {
+            e.codigo += e.oprd.codigo + e.exp1.codigo;
+        }
+        else if(e.oprd == null) {
+            if (e.exp2.oprd != null && e.exp2.oprd.tipo == Operador.IMPLIES){
+                e.codigo = "if " + e.exp1.codigo + ": ";
+                e.codigo += e.exp2.codigo + " end";
+            } else
+                e.codigo += e.exp1.codigo + e.exp2.codigo;
+        }
         else
-            e.codigo = e.oprd.codigo + e.exp1.codigo + e.exp2.codigo;
+            e.codigo += e.exp1.codigo + e.oprd.codigo + e.exp2.codigo;
         
     }
     
@@ -85,8 +89,6 @@ public class GeradorDeCodigo {
             case Operador.MENORIGUAL:
                 oprd.codigo = " <= ";
                 break;
-            case Operador.IMPLIES:
-                break;
         }
     }
     
@@ -95,10 +97,15 @@ public class GeradorDeCodigo {
             String nomeAuto = "inv" + (this.listaInvariantes.size() +1);
             e.nome = nomeAuto;
         }
-        e.codigo = "\tdef " + e.nome + "()\n" + checarInvariante(e);
+        e.codigo = "\tdef " + e.nome + "()\n" + checarInvariante(e) + "\n";
+        e.codigo += "\tend\n";
         this.listaInvariantes.add(e);
     }
     
+    private String checarInvariante(Invariante e) {
+        return "\t\treturn " + e.expressao.codigo;
+    }
+        
     public void classe(Classe c) {
         c.codigo = "class " + c.nome + "\n";
     }
@@ -111,18 +118,76 @@ public class GeradorDeCodigo {
     
     public void restricao(Restricao r) {
         r.codigo = r.classe.codigo;
+        r.codigo += "\tdef checkAllInv()\n";
+        for (Iterator<Invariante> it = listaInvariantes.iterator(); it.hasNext();) {
+            Invariante invariante = it.next();
+            r.codigo += "\t\t" + invariante.nome + "()\n";
+        }
+        r.codigo += "\tend\n";
         for (Iterator<Invariante> it = listaInvariantes.iterator(); it.hasNext();) {
             Invariante invariante = it.next();
             r.codigo += invariante.codigo;
         }
-        System.out.println(r.codigo);
+        r.codigo += "end\n";
+        listaInvariantes.clear();
+    }
+
+
+    public void oprdCol(OprdCol oprd) {
+        switch(oprd.tipo) {
+            case OprdCol.FORALL:
+                oprd.codigo = "all?";
+                break;
+            case OprdCol.SIZE:
+                oprd.codigo = "count";
+                break;
+            case OprdCol.INCLUDES:
+                oprd.codigo = "include?";
+                break;
+            case OprdCol.SELECT:
+                oprd.codigo = "select";
+                break;
+            default:
+                oprd.codigo = "aImplementar";                    
+        }
         
     }
 
-    private String checarInvariante(Invariante e) {
-        return "\t\treturn " + e.expressao.codigo;
+    public void declaradores(Declarador dec) {
+        dec.codigo = "| ";
+        for (Iterator<String> it = dec.listaDeclaradores.iterator(); it.hasNext();) {
+            String declarador = it.next();
+            dec.codigo += declarador;
+            if (it.hasNext())
+                dec.codigo += ", ";
+        }
+        dec.codigo += " |";
     }
-    
+
+    public void parametros(Parametros par) {
+        String blocoIni = "(";
+        String blocoFim = ")";
+        if (par.dec != null) {
+            blocoIni = "{ ";
+            blocoFim = " }";
+            par.codigo += par.dec.codigo;
+        }
+        if (par.exp != null)
+            par.codigo += par.exp.codigo;
+        
+        par.codigo = blocoIni + par.codigo + blocoFim;
+    }
+
+    public void operacaoCol(OperacaoCol oper) {
+        oper.codigo = oper.operacao.codigo + oper.p.codigo;
+    }
+
+    public void chamadaPropriedade(Propriedade p) {
+        p.codigo = p.caminho.caminhoCompleto;
+        if (p.param != null)
+            p.codigo += p.param.codigo;
+    }
+
     private static class GeradorDeCodigoHolder {
 
         private static final GeradorDeCodigo INSTANCE = new GeradorDeCodigo();
