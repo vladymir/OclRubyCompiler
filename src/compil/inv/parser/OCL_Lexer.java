@@ -15,7 +15,8 @@ import static compil.inv.parser.OCL_Sym.*;
  * <tt>ocl.lex</tt>
  */
 public class OCL_Lexer implements java_cup.runtime.Scanner {
-
+	
+	
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
 
