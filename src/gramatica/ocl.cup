@@ -126,7 +126,15 @@ ExpPrimaria ::= Literal:l {: RESULT = new Expressao(l); :}
 		| LPAREN  ExpOcl:e RPAREN {: RESULT = new Expressao(e); :}
 		| ExpressaoIf:eif {: RESULT = new Expressao(eif); :} ;
 
-ExpressaoIf ::= IF ExpOcl:e1 THEN ExpOcl:e2 ELSE ExpOcl:e3 ENDIF {: RESULT = new ExpressaoIf(e1,e2,e3); :};
+ExpressaoIf ::= IF ExpOcl:e1 THEN ExpOcl:e2 ELSE ExpOcl:e3 ENDIF {: 
+	RESULT = new ExpressaoIf(e1,e2,e3); 
+	e1.setTipoRequerido("BOOLEAN"));
+	e1.checkTipo();
+	if ( e2.getTipo.equals(e3.getTipo()) ) {
+		RESULT.setTipo(e2.getTipo());
+	} else {
+		throw new SemanticException("Tipos incompativeis no if: "+e2.getTipo()+" "+ e3.getTipo() );  
+	} :};
 
 
 ChamadaPropriedade ::= Caminho:c ParametrosChamadaPropriedadeOpt:p {: RESULT = new Propriedade(c, p); :};
