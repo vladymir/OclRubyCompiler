@@ -3,6 +3,7 @@
  */
 package compil.inv.semantica;
 
+
 import compil.inv.geracao.GeradorDeCodigo;
 
 /**
@@ -23,19 +24,20 @@ public class Literal extends No {
     
     public Literal(String valor, int tipo) {
         this.valor = valor;
-        if(tipo == NUMERO)
-            if(valor.contains("."))
-                this.tipo = REAL;
-            else
-                this.tipo = INTEIRO;
-        else
-            this.tipo = tipo;
         this.gerarCodigo();
     }
 
     protected void gerarCodigo() {
         this.codigo = valor;
     }
+    
+    public void setTipoNodo(){
+		if(valor.contains(".")){
+			setTipo("REAL");
+		} else {
+			setTipo("INTEGER");
+		}
+	}
     
     
     
