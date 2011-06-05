@@ -121,10 +121,10 @@ ExpPosFixadaAux ::= DOT ChamadaPropriedade:c ExpPosFixadaAux:epf {: RESULT = new
                     |
                     ; 
 
-ExpPrimaria ::= Literal:l {: RESULT = new Expressao(l); :}
-		| ChamadaPropriedade:c {: RESULT = new Expressao(c); :}
-		| LPAREN  ExpOcl:e RPAREN {: RESULT = new Expressao(e); :}
-		| ExpressaoIf:eif {: RESULT = new Expressao(eif); :} ;
+ExpPrimaria ::= Literal:l {: RESULT = new Expressao(l); RESULT.setTipo(l.getTipo()); :}
+		| ChamadaPropriedade:c {: RESULT = new Expressao(c); RESULT.setTipo(c.getTipo());  :}
+		| LPAREN  ExpOcl:e RPAREN {: RESULT = new Expressao(e); RESULT.setTipo(e.getTipo()); :}
+		| ExpressaoIf:eif {: RESULT = new Expressao(eif); RESULT.setTipo(eif.getTipo()); :} ;
 
 ExpressaoIf ::= IF ExpOcl:e1 THEN ExpOcl:e2 ELSE ExpOcl:e3 ENDIF {: 
 	RESULT = new ExpressaoIf(e1,e2,e3); 
