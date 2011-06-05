@@ -10,13 +10,31 @@ import compil.inv.geracao.GeradorDeCodigo;
  * @author nicholas
  */
 public class Expressao extends No {
-    public  No oprd ;
+    public  Operador oprd ;
     public  No exp1 ;
-    public  No exp2 ;
+    public  Expressao exp2 ;
 
+    public Expressao(Propriedade p) {
+        this.exp1 = p;
+        this.gerarCodigo();
+    }
+    
+    public Expressao(Propriedade p, Expressao e) {
+        this.exp1 = p;
+        this.exp2 = e;
+        this.codigo = ".";
+        this.gerarCodigo();
+    }
+    
+    public Expressao(OperacaoCol p, Expressao e) {
+        this.exp1 = p;
+        this.exp2 = e;
+        this.codigo = ".";
+        this.gerarCodigo();
+    }
+    
     public Expressao(Literal l) {
         this.exp1 = l;
-        this.codigo = l.codigo;
         gerarCodigo();
     }
     

@@ -16,7 +16,4 @@ public class Literal {
 		return name;
 	}
 	
-	public String toString(){
-		return "LiteralName: " + name + "           LiteralId: " + id;
-	}
 }	

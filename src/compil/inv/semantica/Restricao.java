@@ -5,7 +5,6 @@ package compil.inv.semantica;
 
 import compil.inv.geracao.GeradorDeCodigo;
 
-
 /**
  *
  * @author nicholas
