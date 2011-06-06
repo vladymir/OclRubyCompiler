@@ -65,10 +65,19 @@ public class Expressao extends No {
         this.exp1 = exp1;
         this.exp2 = exp2;
         gerarCodigo();
-    }
+    }    
 
     protected void gerarCodigo() {
         GeradorDeCodigo.getInstance().concatenarSubExpressoesDe(this);
     }
+    
+    public void setTipoNodo(){
+		if(exp2 == null){
+			setTipo(exp1.getTipo());
+		} else {
+			setTipo(exp2.getTipo());
+			
+		}
+	}
     
 }
