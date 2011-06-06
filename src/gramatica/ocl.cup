@@ -78,8 +78,8 @@ Restricao ::= DeclaracaoContexto:c InvContext:i {: RESULT = new Restricao(c); :}
 DeclaracaoContexto ::= CONTEXT ClassifierContexto:c {: RESULT = c;:} ; 
 
 ClassifierContexto ::= ID:id {: RESULT = new Classe(id); :} 
-                | ID:id1 COLON ID:id2 {: RESULT = new Classe(id1, id2); :} 
-                | ID:id1 DCOLON ID:id2 {: RESULT = new Classe(id1, id2); :} ;
+                | ID:id1 COLON ID:id2 {: RESULT = new Classe(id2, id1); :} 
+                | ID:id1 DCOLON ID:id2 {: RESULT = new Classe(id1); :} ;
 
 InvContext ::= INV COLON ExpOcl:e {: RESULT = new Invariante(e); :} InvContext 
                 | 

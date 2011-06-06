@@ -122,12 +122,15 @@ public class GeradorDeCodigo {
         compil.xmi.Classe classe = classeDoXML(c);
         if (classe != null) {
             c.codigo = "class " + c.nome + "\n";
-            c.codigo += identacao(true) + "def initialize\n";
+            identacao(true);
+            for (Atributo atributo : classe.getMyAtt()) {
+                c.codigo += identacao(false) + "attr_accessor :" + atributo.getNome() + "\n";
+            }
+            c.codigo += identacao(false) + "def initialize\n";
             identacao(true);
             for (Atributo atributo : classe.getMyAtt()) {
                 if (!atributo.getNome().equals("")) {
                     c.codigo += identacao(false) + "@" + atributo.getNome() + "\n";
-                    c.codigo += identacao(false) + "attr_accessor :" + atributo.getNome() + "\n";
                 }
             }
             decrementarIdent();
@@ -162,6 +165,8 @@ public class GeradorDeCodigo {
         this.decrementarIdent();
         for (Iterator<Invariante> it = listaInvariantes.iterator(); it.hasNext();) {
             Invariante invariante = it.next();
+            if (r.classe.apelido != null)
+                invariante.codigo = invariante.codigo.replaceAll(" " + r.classe.apelido + ".", " self.");
             r.codigo += invariante.codigo;
         }
 

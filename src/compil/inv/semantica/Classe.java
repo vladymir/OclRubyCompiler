@@ -12,11 +12,11 @@ import compil.inv.geracao.GeradorDeCodigo;
 public class Classe extends No {
     
     public String nome;
-    public String pacote;
+    public String apelido;
 
-    public Classe(String nome, String pacote) {
+    public Classe(String nome, String apelido) {
         this.nome = nome;
-        this.pacote = pacote;
+        this.apelido = apelido;
         this.gerarCodigo();
     }
 
