@@ -121,17 +121,25 @@ ExpPosFixadaAux ::= DOT ChamadaPropriedade:c ExpPosFixadaAux:epf {: RESULT = new
                     |
                     ; 
 
-ExpPrimaria ::= Literal:l {: RESULT = new Expressao(l); :}
-		| ChamadaPropriedade:c {: RESULT = new Expressao(c); :}
-		| LPAREN  ExpOcl:e RPAREN {: RESULT = new Expressao(e); :}
-		| ExpressaoIf:eif {: RESULT = new Expressao(eif); :} ;
+ExpPrimaria ::= Literal:l {: RESULT = new Expressao(l); RESULT.setTipo(l.getTipo()); :}
+		| ChamadaPropriedade:c {: RESULT = new Expressao(c); RESULT.setTipo(c.getTipo());  :}
+		| LPAREN  ExpOcl:e RPAREN {: RESULT = new Expressao(e); RESULT.setTipo(e.getTipo()); :}
+		| ExpressaoIf:eif {: RESULT = new Expressao(eif); RESULT.setTipo(eif.getTipo()); :} ;
 
-ExpressaoIf ::= IF ExpOcl:e1 THEN ExpOcl:e2 ELSE ExpOcl:e3 ENDIF {: RESULT = new ExpressaoIf(e1,e2,e3); :};
+ExpressaoIf ::= IF ExpOcl:e1 THEN ExpOcl:e2 ELSE ExpOcl:e3 ENDIF {: 
+	RESULT = new ExpressaoIf(e1,e2,e3); 
+	e1.setTipoRequerido("BOOLEAN"));
+	e1.checkTipo();
+	if ( e2.getTipo.equals(e3.getTipo()) ) {
+		RESULT.setTipo(e2.getTipo());
+	} else {
+		throw new SemanticException("Tipos incompativeis no if: "+e2.getTipo()+" "+ e3.getTipo() );  
+	} :};
 
 
 ChamadaPropriedade ::= Caminho:c ParametrosChamadaPropriedadeOpt:p {: RESULT = new Propriedade(c, p); :};
 
-ChamadaPropriedadeColecao ::= OperadorColecao:o ParametrosChamadaPropriedadeOpt:p {: RESULT = new OperacaoCol(o, p); :};
+ChamadaPropriedadeColecao ::= OperadorColecao:o ParametrosChamadaPropriedadeOpt:p {: RESULT = new OperacaoCol(o, p); RESULT.setTipo(o.getTipo()); :};
 							  
 ParametrosChamadaPropriedadeOpt ::= ParametrosChamadaPropriedade:p {: RESULT = p; :} | ; 
 
@@ -155,29 +163,34 @@ Caminho ::= ID:id CaminhoAux:c {: RESULT = new Caminho(id, c); :} ;
 
 CaminhoAux ::= DCOLON ID:id CaminhoAux:c {: RESULT = new Caminho(id, c); :} | ;
 
-Literal ::= STRING:s {: RESULT = new Literal(s, Literal.STRING); :} 
-            | NUMERO:n {: RESULT = new Literal(n, Literal.NUMERO); :} 
-            | TRUE {: RESULT = new Literal("true", Literal.BOOLEANO); :}
-            | FALSE {: RESULT = new Literal("false", Literal.BOOLEANO); :} ;
+Literal ::= STRING:s {: RESULT = new Literal(s, Literal.STRING); RESULT.setTipo("STRING"); :} 
+            | NUMERO:n {: RESULT = new Literal(n, Literal.NUMERO); RESULT.setTipoNodo(); :} 
+            | TRUE {: RESULT = new Literal("true", Literal.BOOLEANO); RESULT.setTipo("BOOLEAN"); :}
+            | FALSE {: RESULT = new Literal("false", Literal.BOOLEANO); RESULT.setTipo("BOOLEAN"); :} ;
 
 
-OperadorColecao ::= INCLUDESALL {: RESULT = new OprdCol(OprdCol.INCLUDESALL); :}
-                | SIZE {: RESULT = new OprdCol(OprdCol.SIZE); :}
-                | INCLUDES {: RESULT = new OprdCol(OprdCol.INCLUDES); :}
-                | EXCLUDES {: RESULT = new OprdCol(OprdCol.EXCLUDES); :}
-                | EXISTS {: RESULT = new OprdCol(OprdCol.EXISTS); :}
-                | SELECT {: RESULT = new OprdCol(OprdCol.SELECT); :}
-                | FORALL {: RESULT = new OprdCol(OprdCol.FORALL); :} ;
+OperadorColecao ::= INCLUDESALL {: RESULT = new OprdCol(OprdCol.INCLUDESALL); RESULT.setTipo("BOOLEAN"); :}
+                | SIZE {: RESULT = new OprdCol(OprdCol.SIZE); RESULT.setTipo("INTEGER"); :}
+                | INCLUDES {: RESULT = new OprdCol(OprdCol.INCLUDES); RESULT.setTipo("BOOLEAN"); :}
+                | EXCLUDES {: RESULT = new OprdCol(OprdCol.EXCLUDES); RESULT.setTipo("BOOLEAN"); :}
+                | EXISTS {: RESULT = new OprdCol(OprdCol.EXISTS); RESULT.setTipo("BOOLEAN"); :}
+                | SELECT {: RESULT = new OprdCol(OprdCol.SELECT); RESULT.setTipo("BOOLEAN"); :}
+                | FORALL {: RESULT = new OprdCol(OprdCol.FORALL); RESULT.setTipo("BOOLEAN"); :} ;
+                
 OperadorMais ::= PLUS {: RESULT = new Operador(Operador.MAIS);:} 
                 | MINUS {:RESULT = new Operador(Operador.MENOS);:};
+                
 OperadorMulti ::= MULT {:RESULT = new Operador(Operador.VEZES);:}
                 | DIVIDE {:RESULT = new Operador(Operador.DIVIDIDO);:} ;
+                
 OperadorUnario ::= MINUS {:RESULT = new Operador(Operador.MENOSU);:} 
                 | NOT {:RESULT = new Operador(Operador.NOT);:};
+                
 OperadorLogico ::= AND {:RESULT = new Operador(Operador.AND);:}
                 | OR {:RESULT = new Operador(Operador.OR);:}
                 | XOR {:RESULT = new Operador(Operador.XOR);:} 
                 | IMPLIES {: RESULT = new Operador(Operador.IMPLIES);:} ;
+                
 OperadorRelacional ::= EQUAL {:RESULT = new Operador(Operador.IGUAL);:}
                 | GT {:RESULT = new Operador(Operador.MAIORQ);:}
                 | LT {:RESULT = new Operador(Operador.MENORQ);:}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="**/*.lex|**/*.cup" kind="src" path="resources/ProjetoCompiladores/src"/>
+	<classpathentry excluding="**/*.lex|**/*.cup" kind="src" path="src"/>
+	<classpathentry kind="lib" path="libs/cup.jar"/>
+	<classpathentry kind="lib" path="libs/java-cup-0.11a-beta-20060608-runtime.jar"/>
+	<classpathentry kind="lib" path="libs/java-cup-0.11a-beta-20060608.jar"/>
+	<classpathentry kind="lib" path="libs/jflex.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
