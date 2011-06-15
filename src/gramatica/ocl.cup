@@ -112,10 +112,15 @@ ExpMultiAux ::= OperadorMulti:o ExpUnaria:e1 ExpMultiAux:e2 {: RESULT = new Expr
 ExpUnaria ::= OperadorUnario:o ExpPosFixada:epf {: RESULT = new Expressao(o, epf); :}
                 | ExpPosFixada:epf {: RESULT = new Expressao(epf); :};
 
-ExpPosFixada ::= ExpPrimaria:ep ExpPosFixadaAux:epf {: RESULT = new Expressao(ep, epf); :};
+ExpPosFixada ::= ExpPrimaria:ep ExpPosFixadaAux:epf {: RESULT = new Expressao(ep, epf); RESULT.setTipoNodo(); :};
 
 
-ExpPosFixadaAux ::= DOT ChamadaPropriedade:c ExpPosFixadaAux:epf {: RESULT = new Expressao(c, epf); :}
+ExpPosFixadaAux ::= DOT ChamadaPropriedade:c ExpPosFixadaAux:epf 
+						{: RESULT = new Expressao(c, epf); 
+							if(epf != null) { 
+								if(epf.getTipo().equals("COLLECTION") )
+									throw new SemanticException("Expressão de coleção inválida"); }
+							RESULT.setTipo(c.getTipo(); :}
                     |
                     RARROW ChamadaPropriedadeColecao:c ExpPosFixadaAux:epf {: RESULT = new Expressao(c, epf); :}
                     |
