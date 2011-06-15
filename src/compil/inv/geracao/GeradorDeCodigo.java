@@ -124,8 +124,11 @@ public class GeradorDeCodigo {
             c.codigo = "class " + c.nome + "\n";
             identacao(true);
             for (Atributo atributo : classe.getMyAtt()) {
-                c.codigo += identacao(false) + "attr_accessor :" + atributo.getNome() + "\n";
+                if (!atributo.getNome().equals("")) {
+                    c.codigo += identacao(false) + "attr_accessor :" + atributo.getNome() + "\n";
+                }
             }
+
             c.codigo += identacao(false) + "def initialize\n";
             identacao(true);
             for (Atributo atributo : classe.getMyAtt()) {
@@ -165,8 +168,9 @@ public class GeradorDeCodigo {
         this.decrementarIdent();
         for (Iterator<Invariante> it = listaInvariantes.iterator(); it.hasNext();) {
             Invariante invariante = it.next();
-            if (r.classe.apelido != null)
+            if (r.classe.apelido != null) {
                 invariante.codigo = invariante.codigo.replaceAll(" " + r.classe.apelido + ".", " self.");
+            }
             r.codigo += invariante.codigo;
         }
 
